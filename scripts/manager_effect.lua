@@ -24,14 +24,14 @@ local aEffectVarMap = {
 -- NOTE: isactive is a DB field that is part of all CT effects, but not tracked in the effect record
 
 function onInit()
-	--Debug.console("CUSTOM EFFECT MANAGER LOADED"); 
+	--Debug.console("CUSTOM EFFECT MANAGER LOADED");
 	CombatManager.setCustomInitChange(processEffects);
-	
+
 	OOBManager.registerOOBMsgHandler(OOB_MSGTYPE_APPLYEFF, handleApplyEffect);
 	OOBManager.registerOOBMsgHandler(OOB_MSGTYPE_EXPIREEFF, handleExpireEffect);
 end
 
-function registerEffectVar(sVar, vData)	
+function registerEffectVar(sVar, vData)
 	if vData and (((vData.sDBType or "") ~= "string") and ((vData.sDBType or "") ~= "number")) then
 		print("Invalid effect variable type registered. (" .. sVar .. ")");
 		return;
@@ -128,11 +128,11 @@ function processEffects(nodeCurrentActor, nodeNewActor)
 	if #aEntries == 0 then
 		return;
 	end
-		
+
 	-- Set up current and new initiative values for effect processing
 	local nCurrentInit;
 	if nodeCurrentActor then
-		nCurrentInit = DB.getValue(nodeCurrentActor, "initresult", 0); 
+		nCurrentInit = DB.getValue(nodeCurrentActor, "initresult", 0);
 	elseif nInitDirection > 0 then
 		nCurrentInit = -10000;
 	else
@@ -146,13 +146,13 @@ function processEffects(nodeCurrentActor, nodeNewActor)
 	else
 		nNewInit = -10000;
 	end
-	
+
 	-- For each actor, advance durations, and process start of turn special effects
 	local bProcessSpecialStart = (nodeCurrentActor == nil);
 	local bProcessSpecialEnd = (nodeCurrentActor == nil);
 	for i = 1,#aEntries do
 		local nodeActor = aEntries[i];
-		
+
 		if nodeActor == nodeCurrentActor then
 			bProcessSpecialEnd = true;
 		elseif nodeActor == nodeNewActor then
@@ -163,7 +163,7 @@ function processEffects(nodeCurrentActor, nodeNewActor)
 		for _,nodeEffect in pairs(DB.getChildren(nodeActor, "effects")) do
 			processEffect(nodeActor, nodeEffect, nCurrentInit, nNewInit, bProcessSpecialStart, bProcessSpecialEnd);
 		end -- END EFFECT LOOP
-		
+
 		if nodeActor == nodeCurrentActor then
 			bProcessSpecialStart = true;
 		elseif nodeActor == nodeNewActor then
@@ -185,7 +185,7 @@ function processEffect(nodeActor, nodeEffect, nCurrentInit, nNewInit, bProcessSp
 
 		if aEffectVarMap["nInit"] then
 			local nEffInit = DB.getValue(nodeEffect, aEffectVarMap["nInit"].sDBField, aEffectVarMap["nInit"].vDBDefault or 0);
-		
+
 			-- Apply start of effect initiative changes
 			if ((nInitDirection > 0) and (nEffInit > nCurrentInit and nEffInit <= nNewInit)) or (nEffInit < nCurrentInit and nEffInit >= nNewInit) then
 				-- Start turn
@@ -203,7 +203,7 @@ function processEffect(nodeActor, nodeEffect, nCurrentInit, nNewInit, bProcessSp
 						DB.setValue(nodeEffect, "duration", "number", nDuration);
 					end
 				end
-				
+
 			-- Apply end of effect initiative changes
 			elseif ((nInitDirection > 0) and (nEffInit >= nCurrentInit and nEffInit < nNewInit)) or (nEffInit <= nCurrentInit and nEffInit > nNewInit) then
 				if fCustomOnEffectEndTurn then
@@ -211,7 +211,7 @@ function processEffect(nodeActor, nodeEffect, nCurrentInit, nNewInit, bProcessSp
 				end
 			end
 		end
-		
+
 		if bProcessSpecialEnd then
 			if fCustomOnEffectActorEndTurn then
 				if fCustomOnEffectActorEndTurn(nodeActor, nodeEffect) then return; end
@@ -231,7 +231,7 @@ function handleApplyEffect(msgOOB)
 		ChatManager.SystemMessage(Interface.getString("ct_error_effectapplyfail") .. " (" .. msgOOB.sTargetNode .. ")");
 		return;
 	end
-	
+
 	-- Reconstitute the effect details
 	local rEffect = {};
 	for k,v in pairs(msgOOB) do
@@ -243,7 +243,7 @@ function handleApplyEffect(msgOOB)
 			end
 		end
 	end
-	
+
 	-- Apply the effect
 	addEffect(msgOOB.user, msgOOB.identity, nodeCTEntry, rEffect, true);
 end
@@ -261,7 +261,7 @@ function notifyApply(rEffect, vTargets)
 			end
 		end
 	end
-	if User.isHost() then
+	if Session.isHost then
 		msgOOB.user = "";
 	else
 		msgOOB.user = User.getUsername();
@@ -291,7 +291,7 @@ function handleExpireEffect(msgOOB)
 		ChatManager.SystemMessage(Interface.getString("ct_error_effectmissingactor") .. " (" .. msgOOB.sEffectNode .. ")");
 		return;
 	end
-	
+
 	expireEffect(nodeActor, nodeEffect, tonumber(msgOOB.nExpireClause) or 0);
 end
 
@@ -301,17 +301,17 @@ function notifyExpire(varEffect, nMatch, bImmediate)
 	elseif type(varEffect) ~= "string" then
 		return;
 	end
-	
+
 	if (nLocked > 0) and not bImmediate then
 		table.insert(aExpireOnLockRelease, varEffect);
 		return;
 	end
-	
+
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_EXPIREEFF;
 	msgOOB.sEffectNode = varEffect;
 	msgOOB.nExpireClause = nMatch;
-	
+
 	Comm.deliverOOBMessage(msgOOB, "");
 end
 
@@ -377,7 +377,7 @@ function message(sMsg, nodeCTEntry, bGMOnly, sUser)
 	if nodeCTEntry then
 		msg.text = msg.text .. " [on " .. ActorManager.getDisplayName(nodeCTEntry) .. "]";
 	end
-	
+
 	if sUser then
 		if sUser == "" then
 			Comm.addChatMessage(msg);
@@ -386,7 +386,7 @@ function message(sMsg, nodeCTEntry, bGMOnly, sUser)
 		end
 	elseif bGMOnly then
 		msg.secret = true;
-		if User.isHost() then
+		if Session.isHost then
 			Comm.addChatMessage(msg);
 		else
 			Comm.deliverChatMessage(msg, User.getUsername());
@@ -400,7 +400,7 @@ function getEffectString(nodeEffect, bPublicOnly)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 1 then
 		return "";
 	end
-	
+
 	local sLabel = DB.getValue(nodeEffect, "label", "");
 
 	local bAddEffect = true;
@@ -408,7 +408,7 @@ function getEffectString(nodeEffect, bPublicOnly)
 	if sLabel == "" then
 		bAddEffect = false;
 	elseif DB.getValue(nodeEffect, "isgmonly", 0) == 1 then
-		if User.isHost() and not bPublicOnly then
+		if Session.isHost and not bPublicOnly then
 			bGMOnly = true;
 		else
 			bAddEffect = false;
@@ -418,14 +418,14 @@ function getEffectString(nodeEffect, bPublicOnly)
 	if not bAddEffect then
 		return "";
 	end
-	
+
 	local aEffectComps = parseEffect(sLabel);
 
 	if isTargetedEffect(nodeEffect) then
 		local sTargets = table.concat(getEffectTargets(nodeEffect, true), ",");
 		table.insert(aEffectComps, 1, "[TRGT: " .. sTargets .. "]");
 	end
-	
+
 	for k,v in pairs(aEffectVarMap) do
 		if v.fDisplay then
 			local vValue = v.fDisplay(nodeEffect);
@@ -461,7 +461,7 @@ end
 
 function getEffectsString(nodeCTEntry, bPublicOnly)
 	local aOutputEffects = {};
-	
+
 	-- Iterate through each effect
 	local aSorted = {};
 	for _,nodeChild in pairs(DB.getChildren(nodeCTEntry, "effects")) do
@@ -474,7 +474,7 @@ function getEffectsString(nodeCTEntry, bPublicOnly)
 			table.insert(aOutputEffects, sEffect);
 		end
 	end
-	
+
 	return table.concat(aOutputEffects, " | ");
 end
 
@@ -505,17 +505,17 @@ end
 ]]--
 function escMagic(str)
 	if not str then return; end
-	str = str:gsub('%(','%%('); 
-	str = str:gsub('%)','%%)'); 
-	str = str:gsub('%.','%%.'); 
-	str = str:gsub('%+','%%+'); 
-	str = str:gsub('%-','%%-'); 
-	str = str:gsub('%*','%%*'); 
-	str = str:gsub('%?','%%?'); 
-	str = str:gsub('%[','%%['); 
-	str = str:gsub('%^','%%^'); 
-	str = str:gsub('%$','%%$'); 
-	return str; 
+	str = str:gsub('%(','%%(');
+	str = str:gsub('%)','%%)');
+	str = str:gsub('%.','%%.');
+	str = str:gsub('%+','%%+');
+	str = str:gsub('%-','%%-');
+	str = str:gsub('%*','%%*');
+	str = str:gsub('%?','%%?');
+	str = str:gsub('%[','%%[');
+	str = str:gsub('%^','%%^');
+	str = str:gsub('%$','%%$');
+	return str;
 end
 
 function addEffect(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg)
@@ -526,19 +526,19 @@ function addEffect(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg)
 	if not nodeEffectsList then
 		return;
 	end
-	
+
 	if fCustomOnEffectAddStart then
 		fCustomOnEffectAddStart(rNewEffect);
 	end
-	
+
 	-- Check whether to ignore new effect (i.e. duplicates)
 	local sDuplicateMsg = nil;
 	if fCustomOnEffectAddIgnoreCheck then
 		sDuplicateMsg = fCustomOnEffectAddIgnoreCheck(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg);
 	else
 		for k, v in pairs(nodeEffectsList.getChildren()) do
-			--Debug.console('comparing: ' .. DB.getValue(v, "label", ""):lower() .. ' to ' .. rNewEffect.sName:lower()); 
-			if (DB.getValue(v, "label", ""):lower() == rNewEffect.sName:lower()) --[[and 
+			--Debug.console('comparing: ' .. DB.getValue(v, "label", ""):lower() .. ' to ' .. rNewEffect.sName:lower());
+			if (DB.getValue(v, "label", ""):lower() == rNewEffect.sName:lower()) --[[and
 					(DB.getValue(v, "init", 0) == rNewEffect.nInit) and
 					(DB.getValue(v, "duration", 0) == rNewEffect.nDuration)]]--
 					then
@@ -550,10 +550,10 @@ function addEffect(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg)
 	if sDuplicateMsg then
 		message(sDuplicateMsg, nodeCT, false, sUser);
 		-- we should try to remove the effect instead!
-		removeEffect(nodeCT,rNewEffect.sName); 
+		removeEffect(nodeCT,rNewEffect.sName);
 		return;
 	end
-	
+
 	-- Write effect record
 	local nodeTargetEffect = nodeEffectsList.createChild();
 	for k,v in pairs(aEffectVarMap) do
@@ -567,7 +567,7 @@ function addEffect(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg)
 	if rNewEffect.sTarget and rNewEffect.sTarget ~= "" then
 		addEffectTarget(nodeTargetEffect, rNewEffect.sTarget);
 	end
-	
+
 	if fCustomOnEffectAddEnd then
 		fCustomOnEffectAddEnd(nodeTargetEffect, rNewEffect);
 	end
@@ -584,7 +584,7 @@ function addEffect(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg)
 	if rNewEffect.sSource and rNewEffect.sSource ~= "" then
 		msg.text = msg.text .. " [by " .. ActorManager.getDisplayName(DB.findNode(rNewEffect.sSource)) .. "]";
 	end
-	
+
 	-- Output message
 	if bShowMsg then
 		if isGMEffect(nodeCT, nodeTargetEffect) then
@@ -620,7 +620,7 @@ function expireEffect(nodeActor, nodeEffect, nExpireComp)
 	if not nodeEffect then
 		return false;
 	end
-	
+
 	local bGMOnly = isGMEffect(nodeActor, nodeEffect);
 
 	if fCustomOnEffectExpire then
@@ -643,7 +643,7 @@ function expireEffect(nodeActor, nodeEffect, nExpireComp)
 			return true;
 		end
 	end
-	
+
 	-- Process full expiration
 	nodeEffect.delete();
 	message("Effect ['" .. sEffect .. "'] -> [EXPIRED]", nodeActor, bGMOnly);
@@ -657,7 +657,7 @@ function disableEffect(nodeActor, nodeEffect)
 
 	local sEffect = DB.getValue(nodeEffect, "label", "");
 	local bGMOnly = isGMEffect(nodeActor, nodeEffect);
-	
+
 	DB.setValue(nodeEffect, "isactive", "number", 2);
 	message("Effect ['" .. sEffect .. "'] -> [DISABLED]", nodeActor, bGMOnly);
 end
@@ -700,7 +700,7 @@ function setEffectSource(nodeEffect, nodeCT)
 	if not nodeEffectActor then
 		return;
 	end
-	
+
 	local sSourcePath = nodeCT.getPath();
 	if nodeEffectActor.getPath() == sSourcePath then
 		DB.setValue(nodeEffect, "source_name", "string", "");
@@ -708,7 +708,7 @@ function setEffectSource(nodeEffect, nodeCT)
 	else
 		DB.setValue(nodeEffect, "source_name", "string", sSourcePath);
 	end
-	
+
 	onCTEffectSourceChanged(nodeEffect, nodeCT);
 end
 
@@ -718,7 +718,7 @@ end
 
 function isEffectTarget(nodeEffect, rTarget)
 	local bMatch = false;
-	
+
 	local sTargetCT = ActorManager.getCTNodeName(rTarget);
 	if sTargetCT ~= "" then
 		for _,v in pairs(DB.getChildren(nodeEffect, "targets")) do
@@ -734,7 +734,7 @@ end
 
 function getEffectTargets(nodeEffect, bUseName)
 	local aTargets = {};
-	
+
 	for _,nodeTarget in pairs(DB.getChildren(nodeEffect, "targets")) do
 		local sNode = DB.getValue(nodeTarget, "noderef", "");
 		if bUseName then
@@ -751,7 +751,7 @@ function addEffectTarget(vEffect, sTargetNode)
 	if sTargetNode == "" then
 		return;
 	end
-	
+
 	local nodeTargetList = nil;
 	if type(vEffect) == "string" then
 		nodeTargetList = DB.createChild(DB.findNode(vEffect), "targets");
@@ -761,7 +761,7 @@ function addEffectTarget(vEffect, sTargetNode)
 	if not nodeTargetList then
 		return;
 	end
-	
+
 	for _,nodeTarget in pairs(nodeTargetList.getChildren()) do
 		if (DB.getValue(nodeTarget, "noderef", "") == sTargetNode) then
 			return;
@@ -778,9 +778,9 @@ function setEffectFactionTargets(nodeEffect, sFaction, bNegated)
 	if not nodeEffect then
 		return;
 	end
-	
+
 	clearEffectTargets(nodeEffect);
-	
+
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
 		if bNegated then
 			if DB.getValue(nodeCT, "friendfoe", "") ~= sFaction then
@@ -806,7 +806,7 @@ end
 
 function decodeEffectFromDrag(draginfo, rTarget)
 	local rEffect = nil;
-	
+
 	local sDragType = draginfo.getType();
 	local sDragDesc = "";
 
@@ -820,7 +820,7 @@ function decodeEffectFromDrag(draginfo, rTarget)
 			sDragDesc = draginfo.getDescription();
 		end
 	end
-	
+
 	if bEffectDrag then
 		rEffect = decodeEffectFromText(sDragDesc, draginfo.getSecret());
 		if rEffect then
@@ -835,7 +835,7 @@ function decodeEffectFromDrag(draginfo, rTarget)
 			end
 		end
 	end
-	
+
 	return rEffect;
 end
 
@@ -872,7 +872,7 @@ end
 
 function encodeEffectAsText(rEffect)
 	local aMessage = {};
-	
+
 	if rEffect then
 		table.insert(aMessage, "[" .. EFFECT_TAG .. "] " .. rEffect.sName);
 
@@ -886,12 +886,12 @@ function encodeEffectAsText(rEffect)
 		if aEffectVarMap["nInit"] and rEffect.nInit and rEffect.nInit ~= 0 then
 			table.insert(aMessage, "[INIT " .. rEffect.nInit .. "]");
 		end
-		
+
 		if rEffect.sSource and rEffect.sSource ~= "" then
 			table.insert(aMessage, "[by " .. rEffect.sSource .. "]");
 		end
 	end
-	
+
 	return table.concat(aMessage, " ");
 end
 
@@ -905,7 +905,7 @@ function decodeEffectFromText(sEffect, bSecret)
 
 	rEffect.sSource = sEffect:match("%[by ([^]]+)%]") or "";
 	s = s:gsub("%[by ([^]]+)%]", "");
-	
+
 	if aEffectVarMap["nInit"] then
 		local sEffectInit = sEffect:match("%[INIT (%d+)%]");
 		if sEffectInit then
@@ -916,11 +916,11 @@ function decodeEffectFromText(sEffect, bSecret)
 
 	s = s:gsub("^%[" .. EFFECT_TAG .. "%] ", "");
 	s = StringManager.trim(s);
-	
+
 	if s == "" then
 		return nil;
 	end
-		
+
 	rEffect.sName = s;
 	if bSecret then
 		rEffect.nGMOnly = 1;

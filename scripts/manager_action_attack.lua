@@ -1,5 +1,5 @@
--- 
--- Please see the license.html file included with this distribution for 
+--
+-- Please see the license.html file included with this distribution for
 -- attribution and copyright information.
 --
 
@@ -18,7 +18,7 @@ end
 function handleApplyAttack(msgOOB)
 	local rSource = ActorManager.getActor(msgOOB.sSourceType, msgOOB.sSourceNode);
 	local rTarget = ActorManager.getActor(msgOOB.sTargetType, msgOOB.sTargetNode);
-	
+
 	local nTotal = tonumber(msgOOB.nTotal) or 0;
 	applyAttack(rSource, rTarget, (tonumber(msgOOB.nSecret) == 1), msgOOB.sAttackType, msgOOB.sDesc, nTotal, msgOOB.sResults);
 end
@@ -30,7 +30,7 @@ function notifyApplyAttack(rSource, rTarget, bSecret, sAttackType, sDesc, nTotal
 
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_APPLYATK;
-	
+
 	if bSecret then
 		msgOOB.nSecret = 1;
 	else
@@ -59,7 +59,7 @@ end
 function notifyApplyHRFC(sTable)
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_APPLYHRFC;
-	
+
 	msgOOB.sTable = sTable;
 
 	Comm.deliverOOBMessage(msgOOB, "");
@@ -79,7 +79,7 @@ function onTargeting(rSource, aTargeting, rRolls)
 		end
 		bRemoveOnMiss = (#aTargets > 1);
 	end
-	
+
 	if bRemoveOnMiss then
 		for _,vRoll in ipairs(rRolls) do
 			vRoll.bRemoveOnMiss = "true";
@@ -89,34 +89,34 @@ function onTargeting(rSource, aTargeting, rRolls)
 	return aTargeting;
 end
 
-function performPartySheetVsRoll(draginfo, rActor, rAction)	
+function performPartySheetVsRoll(draginfo, rActor, rAction)
 	local rRoll = getRoll(nil, rAction);
-	
+
 	if DB.getValue("partysheet.hiderollresults", 0) == 1 then
 		rRoll.bSecret = true;
 		rRoll.bTower = true;
 	end
-	
+
 	ActionsManager.actionDirect(nil, "attack", { rRoll }, { { rActor } });
 end
 
-function performRoll(draginfo, rActor, rAction)		
+function performRoll(draginfo, rActor, rAction)
 	local rRoll = getRoll(rActor, rAction);
-		
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
 function getRoll(rActor, rAction)
 	local bADV = rAction.bADV or false;
 	local bDIS = rAction.bDIS or false;
-	
+
 	-- Build basic roll
 	local rRoll = {};
 	rRoll.sType = "attack";
 	rRoll.aDice = { "d20" };
 	rRoll.nMod = rAction.modifier or 0;
 	rRoll.bWeapon = rAction.bWeapon;
-	
+
 	-- Build the description label
 	rRoll.sDesc = "[ATTACK";
 	if rAction.order and rAction.order > 1 then
@@ -126,12 +126,12 @@ function getRoll(rActor, rAction)
 		rRoll.sDesc = rRoll.sDesc .. " (" .. rAction.range .. ")";
 	end
 	rRoll.sDesc = rRoll.sDesc .. "] " .. rAction.label;
-		
+
 	-- Add crit range
 	if rAction.nCritRange then
 		rRoll.sDesc = rRoll.sDesc .. " [CRIT " .. rAction.nCritRange .. "]";
 	end
-	
+
 	-- Add ability modifiers
 	if rAction.stat then
 		local sAbilityEffect = DataCommon.ability_ltos[rAction.stat];
@@ -149,7 +149,7 @@ function getRoll(rActor, rAction)
 				end
 			end
 		end
-	end		
+	end
 
 	-- Add advantage/disadvantage tags
 	if bADV then
@@ -164,10 +164,10 @@ end
 
 function modAttack(rSource, rTarget, rRoll)
 	clearCritState(rSource);
-	
+
 	local aAddDesc = {};
 	local aAddDice = {};
-	local nAddMod = 0;		
+	local nAddMod = 0;
 
 	-- Check for opportunity attack
 	local bOpportunity = ModifierStack.getModifierKey("ATT_OPP") or Input.isShiftPressed();
@@ -179,18 +179,18 @@ function modAttack(rSource, rTarget, rRoll)
 	-- Check defense modifiers
 	local bCover = ModifierStack.getModifierKey("DEF_COVER");
 	local bSuperiorCover = ModifierStack.getModifierKey("DEF_SCOVER");
-	
+
 	if bSuperiorCover then
 		table.insert(aAddDesc, "[COVER -5]");
 	elseif bCover then
 		table.insert(aAddDesc, "[COVER -2]");
-	end		
+	end
 
 	local bADV = false;
 	local bDIS = false;
 	if rRoll.sDesc:match(" %[ADV%]") then
 		bADV = true;
-		rRoll.sDesc = rRoll.sDesc:gsub(" %[ADV%]", "");		
+		rRoll.sDesc = rRoll.sDesc:gsub(" %[ADV%]", "");
 	end
 	if rRoll.sDesc:match(" %[DIS%]") then
 		bDIS = true;
@@ -211,7 +211,7 @@ function modAttack(rSource, rTarget, rRoll)
 		if sModStat then
 			sActionStat = DataCommon.ability_stol[sModStat];
 		end
-		
+
 		-- Build attack filter
 		if sAttackType == "M" then
 			table.insert(aAttackFilter, "melee");
@@ -221,7 +221,7 @@ function modAttack(rSource, rTarget, rRoll)
 		if bOpportunity then
 			table.insert(aAttackFilter, "opportunity");
 		end
-		
+
 		-- Get attack effect modifiers
 		local bEffects = false;
 		local nEffectCount;
@@ -229,70 +229,70 @@ function modAttack(rSource, rTarget, rRoll)
 		if (nEffectCount > 0) then
 			bEffects = true;
 		end
-				
 
-		-- ranged attack modifiers (medium / out of range)	
+
+		-- ranged attack modifiers (medium / out of range)
 		bDis = false;
 
 		-- Check for range disadvantages if enabled in menu options
-		local bAutomaticRangeModifers = OptionsManager.getOption("CE_ARM"); 
+		local bAutomaticRangeModifers = OptionsManager.getOption("CE_ARM");
 		if (bAutomaticRangeModifers == 'on') and (sAttackType == 'R') then
 			--Debug.chat('manager_action_attack: modAttack rRoll.sDesc', rRoll.sDesc)
 			local bRanged = false;
 			local bInRange = false;
 			local sMessage = '';
-			local sWeaponNameStartIndex = string.find(rRoll.sDesc,']') + 2; -- index start at + 2, because we want the text after the closing bracket, and there is one whitespace			
-			local sWeaponNameEndIndex = string.find(rRoll.sDesc,'[', 2, sWeaponNameStartIndex);	-- start searching after character 2, as we want to find the second '['		
+			local sWeaponNameStartIndex = string.find(rRoll.sDesc,']') + 2; -- index start at + 2, because we want the text after the closing bracket, and there is one whitespace
+			local sWeaponNameEndIndex = string.find(rRoll.sDesc,'[', 2, sWeaponNameStartIndex);	-- start searching after character 2, as we want to find the second '['
 			local sWeaponName = '';
 			--Debug.chat(sWeaponNameStartIndex, sWeaponNameEndIndex)
 			if sWeaponNameEndIndex ~= nil then
-				sWeaponName = string.sub(rRoll.sDesc, sWeaponNameStartIndex, sWeaponNameEndIndex - 2); -- -2 to get rid trailing of whitespace				
+				sWeaponName = string.sub(rRoll.sDesc, sWeaponNameStartIndex, sWeaponNameEndIndex - 2); -- -2 to get rid trailing of whitespace
 			else
 				sWeaponName = string.sub(rRoll.sDesc, sWeaponNameStartIndex);
 			end
-			--local sAttackType = rRoll.sDesc:match("%[ATTACK.*%((%w+)%)%]");			
+			--local sAttackType = rRoll.sDesc:match("%[ATTACK.*%((%w+)%)%]");
 			--sWeaponName = rRoll.sDesc:match("%[ATTACK.*%w+%)].(%.*%)%.[");
 			--Debug.chat('modAttackweapon', rSource, rTarget, sAttackType, sWeaponName)
-			
+
 			-- only get range modifiers if we have a source and target (no target if rolling from CT NPC without target or dropping on target for example, same for PC sheets)
-			local bConditions = RangedAttack.checkConditions(rSource, rTarget);			
+			local bConditions = RangedAttack.checkConditions(rSource, rTarget);
 			if bConditions ~= false then
-				bRanged, bInRange, bDIS, sMessage = RangedAttack.getRangeModifier5e(rSource, rTarget, sAttackType, sWeaponName);			
-				TokenHelper.postChatMessage(sMessage);		
+				bRanged, bInRange, bDIS, sMessage = RangedAttack.getRangeModifier5e(rSource, rTarget, sAttackType, sWeaponName);
+				TokenHelper.postChatMessage(sMessage);
 			end
-		end		
+		end
 
 		-- Check if flanking if setting is enabled in menu and attack is melee
-		local bFlankingRules = OptionsManager.getOption("CE_FR"); 
-		if (bFlankingRules == 'option_val_on') and (sAttackType == 'M') then			
+		local bFlankingRules = OptionsManager.getOption("CE_FR");
+		if (bFlankingRules == 'option_val_on') and (sAttackType == 'M') then
 			local bFlanking = Flanking.isFlanking(rSource, rTarget);
-			if bFlanking == true then 
-				TokenHelper.postChatMessage("Flanking melee attack."); 
+			if bFlanking == true then
+				TokenHelper.postChatMessage("Flanking melee attack.");
 				bADV = true;
-			end		
-		end		
+			end
+		end
 		if (bFlankingRules == 'option_val_1') and (sAttackType == 'M') then
 			local bFlanking = Flanking.isFlanking(rSource, rTarget);
-			if bFlanking == true then 
-				TokenHelper.postChatMessage("Flanking melee attack."); 
+			if bFlanking == true then
+				TokenHelper.postChatMessage("Flanking melee attack.");
 				nAddMod = 1;
-			end								
-		end		
+			end
+		end
 		if (bFlankingRules == 'option_val_2') and (sAttackType == 'M') then
 			local bFlanking = Flanking.isFlanking(rSource, rTarget);
-			if bFlanking == true then 
-				TokenHelper.postChatMessage("Flanking melee attack."); 
+			if bFlanking == true then
+				TokenHelper.postChatMessage("Flanking melee attack.");
 				nAddMod = 2;
-			end								
+			end
 		end
 		if (bFlankingRules == 'option_val_on_5') and (sAttackType == 'M') then
 			local bFlanking = Flanking.isFlanking(rSource, rTarget);
-			if bFlanking == true then 
-				TokenHelper.postChatMessage("Flanking melee attack."); 
+			if bFlanking == true then
+				TokenHelper.postChatMessage("Flanking melee attack.");
 				nAddMod = 5;
-			end								
-		end				
-		
+			end
+		end
+
 		-- Get condition modifiers
 		if EffectManager5E.hasEffect(rSource, "ADVATK", rTarget) then
 			bADV = true;
@@ -347,15 +347,15 @@ function modAttack(rSource, rTarget, rRoll)
 		if EffectManager5E.hasEffectCondition(rSource, "Unconscious") then
 			bEffects = true;
 			bDIS = true; -- (from assumed prone state)
-		end	
+		end
 
 		-- Get ability modifiers
-		local nBonusStat, nBonusEffects = ActorManager2.getAbilityEffectsBonus(rSource, sActionStat);
+		local nBonusStat, nBonusEffects = ActorManager5E.getAbilityEffectsBonus(rSource, sActionStat);
 		if nBonusEffects > 0 then
 			bEffects = true;
 			nAddMod = nAddMod + nBonusStat;
 		end
-		
+
 		-- Get exhaustion modifiers
 		local nExhaustMod, nExhaustCount = EffectManager5E.getEffectsBonus(rSource, {"EXHAUSTION"}, true);
 		if nExhaustCount > 0 then
@@ -364,7 +364,7 @@ function modAttack(rSource, rTarget, rRoll)
 				bDIS = true;
 			end
 		end
-		
+
 		-- Determine crit range
 		local aCritRange = EffectManager5E.getEffectsByType(rSource, "CRIT");
 		if #aCritRange > 0 then
@@ -401,21 +401,21 @@ function modAttack(rSource, rTarget, rRoll)
 		end
 
 	end
-	
+
 	if bSuperiorCover then
 		nAddMod = nAddMod - 5;
 	elseif bCover then
 		nAddMod = nAddMod - 2;
 	end
-	
-	local bDefADV, bDefDIS = ActorManager2.getDefenseAdvantage(rSource, rTarget, aAttackFilter);
+
+	local bDefADV, bDefDIS = ActorManager5E.getDefenseAdvantage(rSource, rTarget, aAttackFilter);
 	if bDefADV then
 		bADV = true;
 	end
 	if bDefDIS then
 		bDIS = true;
 	end
-	
+
 	if #aAddDesc > 0 then
 		rRoll.sDesc = rRoll.sDesc .. " " .. table.concat(aAddDesc, " ");
 	end
@@ -427,7 +427,7 @@ function modAttack(rSource, rTarget, rRoll)
 			table.insert(rRoll.aDice, "p" .. vDie:sub(2));
 		end
 	end
-	rRoll.nMod = rRoll.nMod + nAddMod;	
+	rRoll.nMod = rRoll.nMod + nAddMod;
 
 	ActionsManager2.encodeAdvantage(rRoll, bADV, bDIS);
 end
@@ -444,8 +444,8 @@ function onAttack(rSource, rTarget, rRoll)
 	local rAction = {};
 	rAction.nTotal = ActionsManager.total(rRoll);
 	rAction.aMessages = {};
-	
-	local nDefenseVal, nAtkEffectsBonus, nDefEffectsBonus = ActorManager2.getDefenseValue(rSource, rTarget, rRoll);
+
+	local nDefenseVal, nAtkEffectsBonus, nDefEffectsBonus = ActorManager5E.getDefenseValue(rSource, rTarget, rRoll);
 	if nAtkEffectsBonus ~= 0 then
 		rAction.nTotal = rAction.nTotal + nAtkEffectsBonus;
 		local sFormat = "[" .. Interface.getString("effects_tag") .. " %+d]"
@@ -456,13 +456,13 @@ function onAttack(rSource, rTarget, rRoll)
 		local sFormat = "[" .. Interface.getString("effects_def_tag") .. " %+d]"
 		table.insert(rAction.aMessages, string.format(sFormat, nDefEffectsBonus));
 	end
-	
+
 	local sCritThreshold = string.match(rRoll.sDesc, "%[CRIT (%d+)%]");
 	local nCritThreshold = tonumber(sCritThreshold) or 20;
 	if nCritThreshold < 2 or nCritThreshold > 20 then
 		nCritThreshold = 20;
 	end
-	
+
 	rAction.nFirstDie = 0;
 	if #(rRoll.aDice) > 0 then
 		rAction.nFirstDie = rRoll.aDice[1].result or 0;
@@ -483,22 +483,22 @@ function onAttack(rSource, rTarget, rRoll)
 			table.insert(rAction.aMessages, "[MISS]");
 		end
 	end
-	
+
 	if not rTarget then
 		rMessage.text = rMessage.text .. " " .. table.concat(rAction.aMessages, " ");
 	end
-	
+
 	Comm.deliverChatMessage(rMessage);
-	
+
 	if rTarget then
 		notifyApplyAttack(rSource, rTarget, rRoll.bTower, rRoll.sType, rRoll.sDesc, rAction.nTotal, table.concat(rAction.aMessages, " "));
 	end
-	
+
 	-- TRACK CRITICAL STATE
 	if rAction.sResult == "crit" then
 		setCritState(rSource, rTarget);
 	end
-	
+
 	-- REMOVE TARGET ON MISS OPTION
 	if rTarget then
 		if (rAction.sResult == "miss" or rAction.sResult == "fumble") then
@@ -507,7 +507,7 @@ function onAttack(rSource, rTarget, rRoll)
 			end
 		end
 	end
-	
+
 	-- HANDLE FUMBLE/CRIT HOUSE RULES
 	local sOptionHRFC = OptionsManager.getOption("HRFC");
 	if rAction.sResult == "fumble" and ((sOptionHRFC == "both") or (sOptionHRFC == "fumble")) then
@@ -521,7 +521,7 @@ end
 function applyAttack(rSource, rTarget, bSecret, sAttackType, sDesc, nTotal, sResults)
 	local msgShort = {font = "msgfont"};
 	local msgLong = {font = "msgfont"};
-	
+
 	msgShort.text = "Attack ->";
 	msgLong.text = "Attack [" .. nTotal .. "] ->";
 	if rTarget then
@@ -531,7 +531,7 @@ function applyAttack(rSource, rTarget, bSecret, sAttackType, sDesc, nTotal, sRes
 	if sResults ~= "" then
 		msgLong.text = msgLong.text .. " " .. sResults;
 	end
-	
+
 	msgShort.icon = "roll_attack";
 	if string.match(sResults, "%[CRITICAL HIT%]") then
 		msgLong.icon = "roll_attack_crit";
@@ -541,8 +541,8 @@ function applyAttack(rSource, rTarget, bSecret, sAttackType, sDesc, nTotal, sRes
 		msgLong.icon = "roll_attack_miss";
 	else
 		msgLong.icon = "roll_attack";
-	end	
-		
+	end
+
 	ActionsManager.outputResult(bSecret, rSource, rTarget, msgLong, msgShort);
 end
 
@@ -557,7 +557,7 @@ function setCritState(rSource, rTarget)
 	if rTarget then
 		sTargetCT = ActorManager.getCTNodeName(rTarget);
 	end
-	
+
 	if not aCritState[sSourceCT] then
 		aCritState[sSourceCT] = {};
 	end
@@ -584,13 +584,13 @@ function isCrit(rSource, rTarget)
 	if not aCritState[sSourceCT] then
 		return false;
 	end
-	
+
 	for k,v in ipairs(aCritState[sSourceCT]) do
 		if v == sTargetCT then
 			table.remove(aCritState[sSourceCT], k);
 			return true;
 		end
 	end
-	
+
 	return false;
 end

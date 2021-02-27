@@ -9,24 +9,24 @@
 
 function onInit()
 	-- handler for ping
-	--Debug.console('PING MANAGER LOADED'); 
-	OOBManager.registerOOBMsgHandler('PING_UPDATE',receivePingOOB); 
+	--Debug.console('PING MANAGER LOADED');
+	OOBManager.registerOOBMsgHandler('PING_UPDATE',receivePingOOB);
 end
 
 function doPing(x,y,imgctl)
-	local tokenproto = "tokens/host/Combat Enhancer/ping_target.png";	
+	local tokenproto = "tokens/host/Combat Enhancer/ping_target.png";
 	-- check parent for our image control siblings, if we
 	-- have an 'image sibling' get that window and place
 	-- our marker there else nothing
-	local tWndCtls = imgctl.window.getControls(); 
-	local wndImgRef = imgctl.window.getDatabaseNode().getPath(); 
-	local imgctlPing = nil; 
+	local tWndCtls = imgctl.window.getControls();
+	local wndImgRef = imgctl.window.getDatabaseNode().getPath();
+	local imgctlPing = nil;
 	for k,v in pairs(tWndCtls) do
-		----Debug.console (tostring(k) .. ' ---> ' .. tostring(v.getName())); 
+		----Debug.console (tostring(k) .. ' ---> ' .. tostring(v.getName()));
 		if v.getName() == 'image' then
-			-- we found the image, 
-			imgctlPing = v; 
-			break; 
+			-- we found the image,
+			imgctlPing = v;
+			break;
 		end
 	end
 
@@ -38,17 +38,17 @@ function doPing(x,y,imgctl)
 	--
 	-- Note that toggle may end up juggling windows (opening/closing)
 	-- to clear the prior ping token. We'll need to refresh our reference
-	togglePing(imgctlPing); 
+	togglePing(imgctlPing);
 
 	-- Refresh the references
-	local wndImg = Interface.openWindow("imagewindow",wndImgRef); 
+	local wndImg = Interface.openWindow("imagewindow",wndImgRef);
 	if wndImg then
-		tWndCtls = wndImg.getControls(); 
+		tWndCtls = wndImg.getControls();
 		for k,v in pairs(tWndCtls) do
-			--Debug.console('k: ' .. k .. ' v: ' .. tostring(v.getName())); 
+			--Debug.console('k: ' .. k .. ' v: ' .. tostring(v.getName()));
 			if v.getName() == "image" then
-				imgctlPing = v; 
-				break; 
+				imgctlPing = v;
+				break;
 			end
 		end
 	end
@@ -56,14 +56,14 @@ function doPing(x,y,imgctl)
 	if Input.isShiftPressed() and Input.isControlPressed() and imgctlPing then
 		local tokenMap = imgctlPing.addToken(tokenproto, x, y);
 		if tokenMap then
-			tokenMap.setVisible(true); 			
-			updatePingDataNode(tokenMap,imgctlPing, true); 
-		end			
+			tokenMap.setVisible(true);
+			updatePingDataNode(tokenMap,imgctlPing, true);
+		end
 	elseif Input.isShiftPressed() and imgctlPing then
 		local tokenMap = imgctlPing.addToken(tokenproto, x, y);
 		if tokenMap then
-			tokenMap.setVisible(true); 		
-			updatePingDataNode(tokenMap,imgctlPing, false); 
+			tokenMap.setVisible(true);
+			updatePingDataNode(tokenMap,imgctlPing, false);
 		end
 	end
 
@@ -74,73 +74,73 @@ end
 ]]--
 function sendPingOOB(nodeImage,x,y,z)
 	local OOBMsg = {type="PING_UPDATE",xcoord=x,ycoord=y,zoom=z,image=nodeImage.getPath()};
-	Comm.deliverOOBMessage(OOBMsg); 
-	--Debug.console("SENT PING OOB"); 
+	Comm.deliverOOBMessage(OOBMsg);
+	--Debug.console("SENT PING OOB");
 end
 
 --[[
 	Respond to the OOB if we're not the host
 ]]--
 function receivePingOOB(OOBMsg)
-	if not User.isHost() then
-		--Debug.console("GOT PING OOB"); 
+	if not Session.isHost then
+		--Debug.console("GOT PING OOB");
 		local x = OOBMsg.xcoord;
 		local y = OOBMsg.ycoord;
 		local z = OOBMsg.zoom;
 		local nodeImage = DB.findNode(OOBMsg.image);
 		if nodeImage then
 			local imageName = nodeImage.getName();
-			--Debug.console('image name: ' .. imageName); 
+			--Debug.console('image name: ' .. imageName);
 			local w = Interface.openWindow('imagewindow',nodeImage);
-			--Debug.console('want to open window @' .. imageName .. ' x:' .. x .. ' y:' .. y); 
+			--Debug.console('want to open window @' .. imageName .. ' x:' .. x .. ' y:' .. y);
 			w.image.setViewpointCenter(x,y,z);
 		end
 	end
 end
 
---[[ 
+--[[
 	Update the ping data node. If a token is present
 	then update the reference, if it's not then remove it.
 ]]--
 function updatePingDataNode(token,imgctlPing, bMoveView)
 	local nodePing = DB.findNode('ping');
 	local nodePingId = nil;
-	local nodePingImage = nil; 
+	local nodePingImage = nil;
 
 	if nil == nodePing then
-		createPingData(); 
+		createPingData();
 	else
-		nodePingId = DB.findNode('ping.tokenid'); 
-		nodePingImage = DB.findNode('ping.image'); 
-		nodePing.setPublic(true); 
+		nodePingId = DB.findNode('ping.tokenid');
+		nodePingImage = DB.findNode('ping.image');
+		nodePing.setPublic(true);
 
 		-- failsafe
 		if not nodePingId
 		or not nodePingImage then
 			nodePingId = nodePing.createChild('tokenid','string');
-			nodePingImage = nodePing.createChild('image','string');  
+			nodePingImage = nodePing.createChild('image','string');
 		end
 		-- rectify if needed
-		nodePingId.setPublic(true); 
-		nodePingImage.setPublic(true); 
+		nodePingId.setPublic(true);
+		nodePingImage.setPublic(true);
 
 		if token then
 			local vpx, vpy, vpz = imgctlPing.getViewpoint();
-			local imgNode = imgctlPing.getDatabaseNode(); 
-			imgNode = imgNode.getParent(); 
-			
-			--Debug.console('setting imagename: '  .. simgName); 
-			nodePingImage.setValue(imgNode.getPath()); 
+			local imgNode = imgctlPing.getDatabaseNode();
+			imgNode = imgNode.getParent();
+
+			--Debug.console('setting imagename: '  .. simgName);
+			nodePingImage.setValue(imgNode.getPath());
 			local x,y = token.getPosition();
-			--Debug.console('position x:' .. x .. ' y:' .. y); 
+			--Debug.console('position x:' .. x .. ' y:' .. y);
 			nodePingId.setValue(tostring(token.getId()));
-			
+
 			if (bMoveView == true) then
-				sendPingOOB(imgNode,x,y,vpz); 
+				sendPingOOB(imgNode,x,y,vpz);
 			end
 		else
-			nodePingImage.setValue(''); 
-			nodePingId.setValue(''); 
+			nodePingImage.setValue('');
+			nodePingId.setValue('');
 		end
 	end
 end
@@ -157,12 +157,12 @@ end
 function togglePing(imgctlPing)
 	local nodePing = DB.findNode('ping');
 	local nodePingId = nil;
-	local nodePingImage = nil; 
+	local nodePingImage = nil;
 
 	if nodePing then
-		nodePingId = DB.findNode('ping.tokenid'); 
-		nodePingImage = DB.findNode('ping.image'); 
-		
+		nodePingId = DB.findNode('ping.tokenid');
+		nodePingImage = DB.findNode('ping.image');
+
 		if not nodePingId or not nodePingImage then
 			return false;
 		end
@@ -171,32 +171,32 @@ function togglePing(imgctlPing)
 		-- fine, then we'll cheat by opening up the old image window, deleteing our
 		-- token, and then reopening the current.
 
-		local tokenImgPath = nodePingImage.getValue(); 
-		local tokenId = nodePingId.getValue(); 
-		local curImgPath = imgctlPing.getDatabaseNode().getParent().getPath(); 
-		local tokenlist,wndImg_other,prioropen; 
-		--Debug.console('tokenImgpath: ' .. tostring(tokenImgPath)); 
+		local tokenImgPath = nodePingImage.getValue();
+		local tokenId = nodePingId.getValue();
+		local curImgPath = imgctlPing.getDatabaseNode().getParent().getPath();
+		local tokenlist,wndImg_other,prioropen;
+		--Debug.console('tokenImgpath: ' .. tostring(tokenImgPath));
 
 		if tokenImgPath ~= nil and tokenImgPath ~= '' then
 			if tokenImgPath == curImgPath then
 				tokenlist = imgctlPing.getTokens();
 			else
-				-- open other image window 
-				local nodeImg = DB.findNode(tokenImgPath); 
-				--Debug.console('nodeImg: ' .. tostring(nodeImg)); 
+				-- open other image window
+				local nodeImg = DB.findNode(tokenImgPath);
+				--Debug.console('nodeImg: ' .. tostring(nodeImg));
 				if nodeImg then
-					wndImg_other = Interface.findWindow("imagewindow",nodeImg); 
-					if not wndImg_other then 
-						prioropen = true; 
-						wndImg_other = Interface.openWindow("imagewindow",nodeImg); 
+					wndImg_other = Interface.findWindow("imagewindow",nodeImg);
+					if not wndImg_other then
+						prioropen = true;
+						wndImg_other = Interface.openWindow("imagewindow",nodeImg);
 					end
 					if wndImg_other then
-						local other_ctls = wndImg_other.getControls(); 
+						local other_ctls = wndImg_other.getControls();
 						for k,v in pairs(other_ctls) do
-							--Debug.console('k: ' .. k .. ' v: ' .. tostring(v.getName())); 
+							--Debug.console('k: ' .. k .. ' v: ' .. tostring(v.getName()));
 							if v.getName() == "image" then
-								tokenlist = v.getTokens(); 
-								break; 
+								tokenlist = v.getTokens();
+								break;
 							end
 						end
 					end
@@ -205,14 +205,14 @@ function togglePing(imgctlPing)
 			-- check if token id still exists
 			if tokenlist then
 				for _,v in pairs(tokenlist) do
-					--Debug.console('checking: ' .. tokenId .. ' vs: ' .. v.getId()); 
+					--Debug.console('checking: ' .. tokenId .. ' vs: ' .. v.getId());
 					if tostring(v.getId()) == tokenId then
-						--Debug.console('ping token already active, removing it!'); 
-						v.delete(); 
+						--Debug.console('ping token already active, removing it!');
+						v.delete();
 						-- close our 'other window' if open, reopen, or bring to front our original
 						if wndImg_other and prioropen then
-							wndImg_other.close(); 
-							Interface.openWindow("imagewindow",curImgPath); 
+							wndImg_other.close();
+							Interface.openWindow("imagewindow",curImgPath);
 						end
 						return true;
 					end
@@ -220,17 +220,17 @@ function togglePing(imgctlPing)
 			end
 			-- close our 'other window' if open, reopen, or bring to front our original
 			if wndImg_other and prioropen then
-				wndImg_other.close(); 
-				Interface.openWindow("imagewindow",curImgPath); 
+				wndImg_other.close();
+				Interface.openWindow("imagewindow",curImgPath);
 			end
 		end
 
 	else
-		createPingData(); 
+		createPingData();
 	end
 
-	--Debug.console('ping token NOT active!'); 
-	return false; 
+	--Debug.console('ping token NOT active!');
+	return false;
 end
 
 --[[
@@ -239,16 +239,16 @@ end
 function createPingData()
 	local nodePing = nil;
 	local nodePingId = nil;
-	local nodePingImage = nil; 
+	local nodePingImage = nil;
 
 	nodePing = DB.createNode('ping');
-	nodePing.setPublic(true); 
+	nodePing.setPublic(true);
 	nodePingId = nodePing.createChild('tokenid','string');
-	nodePingId.setPublic(true); 
-	nodePingImage = nodePing.createChild('image','string');  
-	nodePingImage.setPublic(true); 
+	nodePingId.setPublic(true);
+	nodePingImage = nodePing.createChild('image','string');
+	nodePingImage.setPublic(true);
 
-	nodePingImage.setValue(''); 
-	nodePingId.setValue(''); 
+	nodePingImage.setValue('');
+	nodePingId.setValue('');
 end
 

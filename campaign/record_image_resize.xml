@@ -18,7 +18,7 @@
 		<sheetdata>
 			<sub_record_header_image name="header" />
 			<sub_record_toolbar_image name="toolbar" />
-			
+
 			<image_record name="image" />
 			<scrollercontrol name="scroller_image">
 				<anchored to="image" position="insidebottomright" offset="3,3" width="40" height="38" />
@@ -49,7 +49,7 @@
 		<sheetdata>
 			<sub_record_header_image name="header" />
 			<sub_record_toolbar_image name="toolbar" />
-			
+
 			<image_record name="image" />
 			<scrollercontrol name="scroller_image">
 				<anchored to="image" position="insidebottomright" offset="3,3" width="40" height="38" />
@@ -70,7 +70,7 @@
 		<script file="campaign/scripts/updated_imagewindow.lua" />
 		<sheetdata>
 			<sub_record_toolbar_imagepanel name="toolbar" />
-			
+
 			<imagepanel_record name="image" />
 			<scrollercontrol name="scroller_image">
 				<anchored to="image" position="insidebottomright" offset="3,3" width="40" height="38" />
@@ -86,23 +86,23 @@
 		<frame>imagebox_header</frame>
 		<script>
 			function onInit()
-				if User.isHost() then
+				if Session.isHost then
 					nonid_name.resetAnchor("left");
 					nonid_name.setAnchor("left", nil, "center", "absolute", 10);
 					self.onSizeChanged = update;
 				end
 				update();
 			end
-			
+
 			function update()
 				local nodeRecord = getDatabaseNode();
 
 				local bReadOnly = WindowManager.getReadOnlyState(nodeRecord);
 				name.setReadOnly(bReadOnly);
 				nonid_name.setReadOnly(bReadOnly);
-				
+
 				local bID = LibraryData.getIDState("image", nodeRecord);
-				if User.isHost() then
+				if Session.isHost then
 					local w,h = getSize();
 					local bShowNonID = (w >= 450);
 					isidentified.setVisible(bShowNonID);
@@ -131,28 +131,28 @@
 			</string_record_name_image>
 		</sheetdata>
 	</windowclass>
-	
+
 	<windowclass name="imagewindow_toolbar">
 		<frame>toolbar_back</frame>
 		<script>
 			function onInit()
 				update();
 			end
-			
+
 			function getImage()
 				return parentcontrol.window.image;
 			end
-			
+
 			function update()
 				local bHasTokens = getImage().hasTokens();
 
-				if User.isHost() then
+				if Session.isHost then
 					toolbar_draw.setVisibility(true);
 					h2.setVisible(true);
-					
+
 					local bShowGridToggle = getImage().hasGrid();
 					toggle_grid.setVisible(bShowGridToggle);
-					
+
 					local bShowGridToolbar = false;
 					if toggle_grid.getValue() > 0 then
 						bShowGridToolbar = bShowGridToggle;
@@ -173,7 +173,7 @@
 				<anchored position="insidetopleft" offset="0,1" width="0" height="34" />
 				<disabled />
 			</genericcontrol>
-			
+
 			<toolbar_30 name="toolbar_draw">
 				<anchored to="toolbar_anchor">
 					<top />
@@ -209,10 +209,10 @@
 							setActive("");
 						end
 					end
-					
+
 					function onButtonPress(id)
 						local image = window.getImage();
-						
+
 						if id == "paint" then
 							if image.getCursorMode() ~= "draw" then
 								image.setCursorMode("draw");
@@ -298,10 +298,10 @@
 				<script>
 					function onButtonPress(sID)
 						local image = window.getImage();
-						
+
 						local gridsize = image.getGridSize();
 						local ox, oy = image.getGridOffset();
-						
+
 						if (sID == "gridleft") then
 							ox = ox - 1;
 							image.setGridOffset(ox, oy);
@@ -324,7 +324,7 @@
 					end
 				</script>
 			</toolbar_30>
-			
+
 			<genericcontrol name="h1">
 				<anchored to="toolbar_anchor" width="5" height="34">
 					<top />
@@ -343,14 +343,14 @@
 				<script>
 					function onButtonPress()
 						local image = window.getImage();
-						
+
 						if image.getCursorMode() == "select" then
 							image.setCursorMode();
 						else
 							image.setCursorMode("select");
 						end
 					end
-					
+
 					function updateDisplay()
 						if window.getImage().getCursorMode() == "select" then
 							setColor("ffffffff");
@@ -379,14 +379,14 @@
 				<script>
 					function onButtonPress()
 						local image = window.getImage();
-						
+
 						if image.getCursorMode() == "target" then
 							image.setCursorMode();
 						else
 							image.setCursorMode("target");
 						end
 					end
-					
+
 					function updateDisplay()
 						if window.getImage().getCursorMode() == "target" then
 							setColor("ffffffff");
@@ -431,28 +431,28 @@
 			</toolbar_30>
 		</sheetdata>
 	</windowclass>
-	
+
 	<windowclass name="imagepanelwindow_toolbar">
 		<frame>toolbar_back</frame>
 		<script>
 			function onInit()
 				update();
 			end
-			
+
 			function getImage()
 				return parentcontrol.window.image;
 			end
-			
+
 			function update()
 				local bHasTokens = getImage().hasTokens();
 
-				if User.isHost() then
+				if Session.isHost then
 					toolbar_draw.setVisibility(true);
 					h2.setVisible(true);
-					
+
 					local bShowGridToggle = getImage().hasGrid();
 					toggle_grid.setVisible(bShowGridToggle);
-					
+
 					local bShowGridToolbar = false;
 					if toggle_grid.getValue() > 0 then
 						bShowGridToolbar = bShowGridToggle;
@@ -473,7 +473,7 @@
 				<anchored position="insidetopright" offset="100,0" width="0" height="34" />
 				<disabled />
 			</genericcontrol>
-			
+
 			<toolbar_30 name="toolbar_targeting">
 				<anchored to="toolbar_anchor">
 					<top />
@@ -518,14 +518,14 @@
 				<script>
 					function onButtonPress()
 						local image = window.getImage();
-						
+
 						if image.getCursorMode() == "target" then
 							image.setCursorMode();
 						else
 							image.setCursorMode("target");
 						end
 					end
-					
+
 					function updateDisplay()
 						if window.getImage().getCursorMode() == "target" then
 							setColor("ffffffff");
@@ -554,7 +554,7 @@
 				<script>
 					function onButtonPress()
 						local image = window.getImage();
-						
+
 						if image.getCursorMode() == "select" then
 							image.setCursorMode();
 						else
@@ -562,7 +562,7 @@
 						end
 
 					end
-					
+
 					function updateDisplay()
 						if window.getImage().getCursorMode() == "select" then
 							setColor("ffffffff");
@@ -619,10 +619,10 @@
 				<script>
 					function onButtonPress(sID)
 						local image = window.getImage();
-						
+
 						local gridsize = image.getGridSize();
 						local ox, oy = image.getGridOffset();
-						
+
 						if (sID == "gridleft") then
 							ox = ox - 1;
 							image.setGridOffset(ox, oy);
@@ -703,10 +703,10 @@
 							setActive("");
 						end
 					end
-					
+
 					function onButtonPress(id)
 						local image = window.getImage();
-						
+
 						if id == "paint" then
 							if image.getCursorMode() ~= "draw" then
 								image.setCursorMode("draw");

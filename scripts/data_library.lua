@@ -1,14 +1,14 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 -- RECORD TYPE FORMAT
--- 		["recordtype"] = { 
+-- 		["recordtype"] = {
 --			bExport = <bool>,
 -- 			bHidden = <bool>,
 -- 			bID = <bool>,
 --			bNoCategories = <bool>,
 --			bAllowClientEdit = <bool>,
--- 			aDataMap = <table of strings>, 
--- 			aDisplayIcon = <table of 2 strings>, 
+-- 			aDataMap = <table of strings>,
+-- 			aDisplayIcon = <table of 2 strings>,
 --			fToggleIndex = <function>
 -- 			sListDisplayClass = <string>,
 -- 			sRecordDisplayClass = <string>,
@@ -36,13 +36,13 @@
 --		bNoCateories = Optional. Disable display and usage of category information.
 --		bAllowClientEdit = Optional. Allow clients to add/delete records in the list that they own.
 --		aDataMap = Required. Table of strings. defining the valid data paths for records of this type
---			NOTE: For bExport/nExport, that number of data paths from the beginning of the data map list will be used as the source for exporting 
+--			NOTE: For bExport/nExport, that number of data paths from the beginning of the data map list will be used as the source for exporting
 --				and the target data paths will be the same in the module. (i.e. default campaign data paths, editable).
---				The next nExport data paths in the data map list will be used as the export target data paths for read-only data paths for the 
+--				The next nExport data paths in the data map list will be used as the export target data paths for read-only data paths for the
 --				matching source data path.
 --			EX: { "item", "armor", "weapon", "reference.items", "reference.armors", "reference.weapons" } with a nExport of 3 would mean that
 --				the "item", "armor" and "weapon" data paths would be exported to the matching "item", "armor" and "weapon" data paths in the module by default.
---				If the reference data path option is selected, then "item", "armor" and "weapon" data paths would be exported to 
+--				If the reference data path option is selected, then "item", "armor" and "weapon" data paths would be exported to
 --				"reference.items", "reference.armors", and "reference.weapons", respectively.
 --		aDisplayIcon = Required. Table of strings. Provides icon resource names for sidebar/library buttons for this record type (normal and pressed icon resources)
 --		fToggleIndex = Optional. Function. This function will be called when the sidebar/library button is pressed for this record type. If not defined, a default master list window will be toggled.
@@ -59,9 +59,9 @@
 
 function toggleCharRecordIndex()
 	local sDisplayIndex;
-	if User.isLocal() then
+	if Session.isLocal then
 		sDisplayIndex = "charselect_local";
-	elseif User.isHost() then
+	elseif Session.isHost then
 		sDisplayIndex = "charselect_host";
 	else
 		sDisplayIndex = "charselect_client";
@@ -82,99 +82,99 @@ aRecords = {
 		bHidden = true,
 		aDataMap = { "modifiers" },
 	},
-	
-	["charsheet"] = { 
+
+	["charsheet"] = {
 		sExportPath = "pregencharsheet";
 		sExportListClass = "pregencharselect";
-		aDataMap = { "charsheet" }, 
+		aDataMap = { "charsheet" },
 		aDisplayIcon = { "button_characters", "button_characters_down" },
 		fToggleIndex = toggleCharRecordIndex,
-		-- sRecordDisplayClass = "charsheet", 
+		-- sRecordDisplayClass = "charsheet",
 	},
-	["note"] = { 
+	["note"] = {
 		bNoCategories = true,
 		sEditMode = "play",
-		aDataMap = { "notes" }, 
+		aDataMap = { "notes" },
 		aDisplayIcon = { "button_notes", "button_notes_down" },
 		sListDisplayClass = "masterindexitem_note",
-		-- sRecordDisplayClass = "note", 
+		-- sRecordDisplayClass = "note",
 	},
 
-	["story"] = { 
+	["story"] = {
 		bExport = true,
-		aDataMap = { "encounter", "reference.encounters" }, 
+		aDataMap = { "encounter", "reference.encounters" },
 		aDisplayIcon = { "button_book", "button_book_down" },
-		sRecordDisplayClass = "encounter", 
+		sRecordDisplayClass = "encounter",
 		aGMListButtons = { "button_storytemplate" },
 		},
-	["storytemplate"] = { 
+	["storytemplate"] = {
 		bExport = true,
 		bHidden = true,
-		aDataMap = { "storytemplate", "reference.storytemplates" }, 
-		-- sRecordDisplayClass = "storytemplate", 
+		aDataMap = { "storytemplate", "reference.storytemplates" },
+		-- sRecordDisplayClass = "storytemplate",
 		},
-	["quest"] = { 
+	["quest"] = {
 		bExport = true,
-		aDataMap = { "quest", "reference.quests" }, 
+		aDataMap = { "quest", "reference.quests" },
 		aDisplayIcon = { "button_quests", "button_quests_down" },
-		-- sRecordDisplayClass = "quest", 
+		-- sRecordDisplayClass = "quest",
 	},
-	["image"] = { 
+	["image"] = {
 		bExportNoReadOnly = true,
 		bID = true,
-		aDataMap = { "image", "reference.images" }, 
-		aDisplayIcon = { "button_maps", "button_maps_down" }, 
+		aDataMap = { "image", "reference.images" },
+		aDisplayIcon = { "button_maps", "button_maps_down" },
 		sListDisplayClass = "masterindexitem_id",
 		sRecordDisplayClass = "imagewindow",
 		aGMListButtons = { "button_folder_image", "button_store_image" },
 	},
-	["npc"] = { 
+	["npc"] = {
 		bExport = true,
 		bID = true,
-		aDataMap = { "npc", "reference.npcs" }, 
+		aDataMap = { "npc", "reference.npcs" },
 		aDisplayIcon = { "button_people", "button_people_down" },
 		sListDisplayClass = "masterindexitem_id",
-		-- sRecordDisplayClass = "npc", 
+		-- sRecordDisplayClass = "npc",
 	},
-	["battle"] = { 
+	["battle"] = {
 		bExport = true,
-		aDataMap = { "battle", "reference.battles" }, 
+		aDataMap = { "battle", "reference.battles" },
 		aDisplayIcon = { "button_encounters", "button_encounters_down" },
-		-- sRecordDisplayClass = "battle", 
+		-- sRecordDisplayClass = "battle",
 		aGMListButtons = { "button_battlerandom" },
 	},
-	["battlerandom"] = { 
+	["battlerandom"] = {
 		bExport = true,
 		bHidden = true,
-		aDataMap = { "battlerandom", "reference.battlerandoms" }, 
-		-- sRecordDisplayClass = "battlerandom", 
+		aDataMap = { "battlerandom", "reference.battlerandoms" },
+		-- sRecordDisplayClass = "battlerandom",
 	},
-	["item"] = { 
+	["item"] = {
 		bExport = true,
 		bID = true,
-		aDataMap = { "item", "reference.items" }, 
-		aDisplayIcon = { "button_items", "button_items_down" }, 
+		aDataMap = { "item", "reference.items" },
+		aDisplayIcon = { "button_items", "button_items_down" },
 		sListDisplayClass = "masterindexitem_id",
 		-- sRecordDisplayClass = "item",
 		},
-	["treasureparcel"] = { 
+	["treasureparcel"] = {
 		bExport = true,
-		aDataMap = { "treasureparcels", "reference.treasureparcels" }, 
+		aDataMap = { "treasureparcels", "reference.treasureparcels" },
 		aDisplayIcon = { "button_parcels", "button_parcels_down" },
-		-- sRecordDisplayClass = "treasureparcel", 
+		-- sRecordDisplayClass = "treasureparcel",
 	},
-	["table"] = { 
+	["table"] = {
 		bExport = true,
-		aDataMap = { "tables", "reference.tables" }, 
+		aDataMap = { "tables", "reference.tables" },
 		aDisplayIcon = { "button_tables", "button_tables_down" },
-		-- sRecordDisplayClass = "table", 
+		-- sRecordDisplayClass = "table",
 		aGMEditButtons = { "button_add_table_guided" };
 	},
-	["vehicle"] = { 
+	["vehicle"] = {
 		bExport = true,
-		aDataMap = { "vehicle", "reference.vehicles" }, 
+		aDataMap = { "vehicle", "reference.vehicles" },
 		aDisplayIcon = { "button_vehicles", "button_vehicles_down" },
-		-- sRecordDisplayClass = "vehicle", 
+		-- sRecordDisplayClass = "vehicle",
 		aGMListButtons = { "button_vehicle_type" };
 		aCustomFilters = {
 			["Type"] = { sField = "type" },
@@ -203,7 +203,7 @@ function initialize()
 	sFilterValueYes = Interface.getString("library_recordtype_filter_yes");
 	sFilterValueNo = Interface.getString("library_recordtype_filter_no");
 	sFilterValueEmpty = Interface.getString("library_recordtype_filter_empty");
-	
+
 	for kRecordType,vRecord in pairs(aRecords) do
 		vRecord.sDisplayText = Interface.getString("library_recordtype_label_" .. kRecordType);
 		vRecord.sEmptyNameText = Interface.getString("library_recordtype_empty_" .. kRecordType);
@@ -212,7 +212,7 @@ function initialize()
 		end
 		vRecord.sExportDisplayText = Interface.getString("library_recordtype_export_" .. kRecordType);
 		if vRecord.sExportDisplayText == "" then vRecord.sExportDisplayText = vRecord.sDisplayText; end
-		
+
 		local aMappings = getMappings(kRecordType);
 		if aMappings and (#aMappings > 0) then
 			local rExport = {};
@@ -254,7 +254,7 @@ function initialize()
 					rExport.exportref = aExportRefMappings;
 				end
 			end
-			
+
 			if rExport.source then
 				ExportManager.registerExportNode(rExport);
 			end
@@ -363,7 +363,7 @@ function getIndexDisplayClass(sRecordType)
 end
 function getIndexButtons(sRecordType)
 	if aRecords[sRecordType] then
-		if User.isHost() then
+		if Session.isHost then
 			return (aRecords[sRecordType].aGMListButtons or {});
 		else
 			return (aRecords[sRecordType].aPlayerListButtons or {});
@@ -376,7 +376,7 @@ function addIndexButton(sRecordType, sButtonTemplate)
 		return;
 	end
 	if aRecords[sRecordType] then
-		if User.isHost() then
+		if Session.isHost then
 			if not aRecords[sRecordType].aGMListButtons then
 				aRecords[sRecordType].aGMListButtons = {};
 			end
@@ -395,7 +395,7 @@ function addIndexButton(sRecordType, sButtonTemplate)
 end
 function getEditButtons(sRecordType)
 	if aRecords[sRecordType] then
-		if User.isHost() then
+		if Session.isHost then
 			return (aRecords[sRecordType].aGMEditButtons or {});
 		else
 			return (aRecords[sRecordType].aPlayerEditButtons or {});
@@ -479,17 +479,17 @@ function getIDOption(sRecordType)
 end
 function getIDState(sRecordType, vNode, bIgnoreHost)
 	local bID = true;
-	
+
 	if isIdentifiable(sRecordType, vNode) then
 		if aRecords[sRecordType].fGetIDState then
 			bID = aRecords[sRecordType].fGetIDState(vNode, bIgnoreHost);
 		else
-			if (bIgnoreHost or not User.isHost()) then
+			if (bIgnoreHost or not Session.isHost) then
 				bID = (DB.getValue(vNode, "isidentified", 1) == 1);
 			end
 		end
 	end
-	
+
 	return bID, true;
 end
 
@@ -521,14 +521,14 @@ function allowEdit(sRecordType)
 		local vEditMode = aRecords[sRecordType].sEditMode;
 		if vEditMode then
 			if vEditMode == "play" then
-				return not User.isLocal();
+				return not Session.isLocal;
 			elseif vEditMode == "none" then
 				return false;
 			end
 		end
 
 		-- Default behavior (host only editing, no local or player)
-		if User.isHost() then
+		if Session.isHost then
 			return true;
 		end
 	end

@@ -1,17 +1,17 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 function onInit()
-	if User.isHost() then
+	if Session.isHost then
 		setTokenOrientationMode(false);
-		-- Setup map tokens; 
-		MapTokenManager.initMapTokens(self); 
+		-- Setup map tokens;
+		MapTokenManager.initMapTokens(self);
 		-- Add additiona token functions on init
 		local tokenList = self.getTokens();
 		for _,token in pairs(tokenList) do
-			MapTokenManager.addAdditionalTokenMenus(token); 
+			MapTokenManager.addAdditionalTokenMenus(token);
 		end
 	end
-	
+
 	onCursorModeChanged();
 	onGridStateChanged();
 	-- window.updateDisplay();
@@ -26,22 +26,22 @@ end
 	Add additional visibility parameters
 ]]--
 function onTokenAdded(token)
-	if User.isHost() then
-		MapTokenManager.addAdditionalTokenMenus(token); 
+	if Session.isHost then
+		MapTokenManager.addAdditionalTokenMenus(token);
 	end
 end
 
 -- place the token if we're in select mode
 function onClickRelease(button, x, y)
-	local sTool = getCursorMode(); 
+	local sTool = getCursorMode();
 
-	if User.isHost() and sTool == nil then
-		--Debug.console('click release! no active tool!'); 
+	if Session.isHost and sTool == nil then
+		--Debug.console('click release! no active tool!');
 		-- get location of mouse with respect to viewport + grid
 		local vpx, vpy, vpz = getViewpoint();
 		x = x / vpz;
 		y = y / vpz;
-					
+
 		PingManager.doPing(x,y,self);
 		--FOW.toggleFOW(x,y,self);
 	end
@@ -56,10 +56,10 @@ function onGridStateChanged(gridtype)
 	--Debug.console("image.lua: onGridStateChanged.  Image control = " .. self.getName());
 	--EXT
 	if self.hasGrid() then
-		window.syncToPlayImageGrid(self);	
+		window.syncToPlayImageGrid(self);
 	else
 		-- The grid has been turned off on this layer - turn it off across all layers
-		window.removeGrid();	
+		window.removeGrid();
 	end
 
 	--Debug.console("image.lua: onGridStateChanged. Calling updateDisplay.");
@@ -75,7 +75,7 @@ function onTargetSelect(aTargets)
 		----Debug.console("image.lua: onTargetSelect - image control = " .. self.getName());
 		return false;
 	end
-	
+
 	local aSelected = getSelectedTokens();
 	if #aSelected == 0 then
 		local tokenActive = TargetingManager.getActiveToken(self);
@@ -87,7 +87,7 @@ function onTargetSelect(aTargets)
 					break;
 				end
 			end
-			
+
 			for _,vToken in ipairs(aTargets) do
 				tokenActive.setTarget(not bAllTargeted, vToken);
 			end
@@ -104,7 +104,7 @@ function onDrop(x, y, draginfo)
 	local vpx, vpy, vpz = getViewpoint();
 	x = x / vpz;
 	y = y / vpz;
-	
+
 	-- If grid, then snap drop point and adjust drop spread
 	local nDropSpread = 15;
 	if hasGrid() then
@@ -113,23 +113,23 @@ function onDrop(x, y, draginfo)
 	end
 
 	-- for the map tokens, we also want to ensure only the host can do this
-	if sDragType == "shortcut" and User.isHost() then
+	if sDragType == "shortcut" and Session.isHost then
 		local dbref = draginfo.getDatabaseNode();
 		if dbref then
 			local nodeName = dbref.getNodeName();
-			local topLevelName,pathItems; 
-			pathItems = StringManager.split(nodeName,'.'); 
+			local topLevelName,pathItems;
+			pathItems = StringManager.split(nodeName,'.');
 
-			topLevelName = pathItems[1]; 
-			--Debug.console('shortcut: ' .. topLevelName .. ' full node name: ' .. nodeName); 
+			topLevelName = pathItems[1];
+			--Debug.console('shortcut: ' .. topLevelName .. ' full node name: ' .. nodeName);
 			if topLevelName == 'npc' then
-				MapTokenManager.prepMapToken(x,y,dbref,self); 
-				return true; 
+				MapTokenManager.prepMapToken(x,y,dbref,self);
+				return true;
 			elseif topLevelName == 'reference' then
 				local secondLevelName = pathItems[2];
 				if secondLevelName == 'npcdata' then
-					MapTokenManager.prepMapToken(x,y,dbref,self); 
-					return true; 
+					MapTokenManager.prepMapToken(x,y,dbref,self);
+					return true;
 				end
 			end
 		end
@@ -142,10 +142,10 @@ function onDrop(x, y, draginfo)
 		end
 	elseif sDragType == "combattrackerff" then
 		return CombatManager.handleFactionDropOnImage(draginfo, self, x, y);
-	elseif sDragType == "token" and User.isHost() then
+	elseif sDragType == "token" and Session.isHost then
 		-- MIGRATED to onDragEnd of the tokenfield
 	else
-		--Debug.console('drag type is : ' .. sDragType); 
+		--Debug.console('drag type is : ' .. sDragType);
 	end
 end
 
@@ -160,32 +160,32 @@ function getLastCoords()
 	end
 end
 
-function updateLastCoords(x, y) 
+function updateLastCoords(x, y)
 	last.x = x;
 	last.y = y;
 end
 
 function onClickDown(button, x, y)
     -- Determine if middle mouse button is clicked
-	if button==2 then		
+	if button==2 then
 	    -- update last x, y position with current coordinates
 		last.x = x;
 		last.y = y;
 	end
 
 	-- if status icons is loaded, then we want to close the fake 'context window'
-	local wnd = Interface.findWindow('minieffects','effects'); 
+	local wnd = Interface.findWindow('minieffects','effects');
 	if wnd then
-		wnd.close(); 
+		wnd.close();
 	end
 
 end
 
 function onClose()
 	-- if status icons is loaded, then we want to close the fake 'context window'
-	local wnd = Interface.findWindow('minieffects','effects'); 
+	local wnd = Interface.findWindow('minieffects','effects');
 	if wnd then
-		wnd.close(); 
+		wnd.close();
 	end
 
 end
@@ -196,7 +196,7 @@ end
 
 function onDrag(button, x, y, draginfo)
 	-- Determine if middle mouse button is clicked
-	if button == 2 then		
+	if button == 2 then
 		-- Determine drag distance since initial click
 		local dx = x - (last.x or 0);
 		local dy = y - (last.y or 0);
@@ -204,8 +204,8 @@ function onDrag(button, x, y, draginfo)
 		local nx, ny, zoom = getViewpoint();
 		 -- update last x, y position with current coordinates
 		updateLastCoords(x,y);
-		
-		if User.isHost() then
+
+		if Session.isHost then
 			-- set the new viewpoint based upon current viewpoint + drag distance
 			window.image.setViewpoint(nx+dx, ny+dy, zoom);
 			-- sync viewpoints for all layers
@@ -222,13 +222,13 @@ end
 
 
 -- Height Extension modifications
-local measureLock = false; 
+local measureLock = false;
 function acquireMeasureSemaphore()
 	if not measureLock then
-		measureLock = true; 
-		return true; 
+		measureLock = true;
+		return true;
 	end
-	return false; 
+	return false;
 end
 
 -- releases the semaphore if it is held
@@ -243,7 +243,7 @@ function checkMeasureSempahore()
 	return measureLock;
 end
 
-local listCT; 
+local listCT;
 -- We're preforming up to N lookups each time to find tokens
 -- at the pointer start/end positions, fortunately,
 -- the points given for targeting are directly
@@ -251,24 +251,24 @@ local listCT;
 -- is useless, the map coords are where the real
 -- meat is.
 function getNodeHeightsAt(posSX,posSY,posEX,posEY,gridSize)
-	local startTokenHeight = nil; 
-	local endTokenHeight = nil; 
+	local startTokenHeight = nil;
+	local endTokenHeight = nil;
 
 	if not listCT then
-		listCT = DB.findNode('combattracker.list'); 
+		listCT = DB.findNode('combattracker.list');
 	end
 
-	local ctEntries = listCT.getChildren(); 
+	local ctEntries = listCT.getChildren();
 
 	for k,v in pairs(ctEntries) do
-		token = CombatManager.getTokenFromCT(v); 
+		token = CombatManager.getTokenFromCT(v);
 		if token then
 			local posX,posY = token.getPosition()
-			--Debug.console('coords of token ' .. v.getChild('name').getValue() .. ' X: ' .. posX .. ' Y: ' .. posY .. ' ++VS++ X: ' .. posSX .. ' Y: ' .. posSY); 
+			--Debug.console('coords of token ' .. v.getChild('name').getValue() .. ' X: ' .. posX .. ' Y: ' .. posY .. ' ++VS++ X: ' .. posSX .. ' Y: ' .. posSY);
 			if posX == posSX and posY == posSY then
-				startTokenHeight = getCTEntryHeight(v); 
+				startTokenHeight = getCTEntryHeight(v);
 			elseif posX == posEX and posY == posEY then
-				endTokenHeight = getCTEntryHeight(v); 
+				endTokenHeight = getCTEntryHeight(v);
 			end
 			-- end prematurely
 			if startTokenHeight ~= nil and endTokenHeight ~= nil then
@@ -285,29 +285,29 @@ function getNodeHeightsAt(posSX,posSY,posEX,posEY,gridSize)
 	end
 
 
-	return startTokenHeight, endTokenHeight; 
+	return startTokenHeight, endTokenHeight;
 end
 
 -- just get the node
 function getCTNodesAt(posSX,posSY,posEX,posEY)
-	local startNodeCT = nil; 
-	local endNodeCT = nil; 
+	local startNodeCT = nil;
+	local endNodeCT = nil;
 
 	if not listCT then
-		listCT = DB.findNode('combattracker.list'); 
+		listCT = DB.findNode('combattracker.list');
 	end
 
-	local ctEntries = listCT.getChildren(); 
+	local ctEntries = listCT.getChildren();
 
 	for k,v in pairs(ctEntries) do
-		token = CombatManager.getTokenFromCT(v); 
+		token = CombatManager.getTokenFromCT(v);
 		if token then
 			local posX,posY = token.getPosition()
-			--Debug.console('coords of token ' .. v.getChild('name').getValue() .. ' X: ' .. posX .. ' Y: ' .. posY .. ' ++VS++ X: ' .. posSX .. ' Y: ' .. posSY); 
+			--Debug.console('coords of token ' .. v.getChild('name').getValue() .. ' X: ' .. posX .. ' Y: ' .. posY .. ' ++VS++ X: ' .. posSX .. ' Y: ' .. posSY);
 			if posX == posSX and posY == posSY then
-				startNodeCT = v; 
+				startNodeCT = v;
 			elseif posX == posEX and posY == posEY then
-				endNodeCT = v; 
+				endNodeCT = v;
 			end
 			-- end prematurely
 			if startNodeCT ~= nil and endNodeCT ~= nil then
@@ -316,7 +316,7 @@ function getCTNodesAt(posSX,posSY,posEX,posEY)
 		end
 	end
 
-	return startNodeCT, endNodeCT; 
+	return startNodeCT, endNodeCT;
 end
 
 -- get the CT Height entry if it exists
@@ -324,57 +324,57 @@ function getCTEntryHeight(ctEntry)
 	if ctEntry then
 		local heightNode = ctEntry.getChild('height');
 		if heightNode then
-			return heightNode.getValue(); 
+			return heightNode.getValue();
 		else
-			--Debug.console('no height node!'); 
+			--Debug.console('no height node!');
 		end
 	end
-	return 0; 
+	return 0;
 end
 
 -- sub in the measurement text for our custom varient for height
 function onMeasurePointer(pixellength,pointertype,startx,starty,endx,endy)
-	local lock = acquireMeasureSemaphore(); 
+	local lock = acquireMeasureSemaphore();
 	if lock then
-		--Debug.console("node of CT " .. tostring(type(DB.findNode('combattracker.list')))); 
-		local gridSize = self.getGridSize(); 
-		local snapSX,snapSY = snapToGrid(startx,starty); 
-		local snapEX,snapEY = snapToGrid(endx,endy); 
-		--Debug.console('coords are x:' .. snapSX/gridSize .. ' y: ' .. snapSY/gridSize .. ' to x: ' .. snapEX/gridSize .. ' y: ' .. snapEY/gridSize); 
+		--Debug.console("node of CT " .. tostring(type(DB.findNode('combattracker.list'))));
+		local gridSize = self.getGridSize();
+		local snapSX,snapSY = snapToGrid(startx,starty);
+		local snapEX,snapEY = snapToGrid(endx,endy);
+		--Debug.console('coords are x:' .. snapSX/gridSize .. ' y: ' .. snapSY/gridSize .. ' to x: ' .. snapEX/gridSize .. ' y: ' .. snapEY/gridSize);
 
-		--local ctNodeStart,ctNodeEnd = getCTNodesAt(startx,starty,endx,endy,gridSize); 
-		local ctNodeStart,ctNodeEnd = getCTNodesAt(startx,starty,endx,endy); 
+		--local ctNodeStart,ctNodeEnd = getCTNodesAt(startx,starty,endx,endy,gridSize);
+		local ctNodeStart,ctNodeEnd = getCTNodesAt(startx,starty,endx,endy);
 
 
-		local heightDistance = 0; 
+		local heightDistance = 0;
 		if HeightManager ~= nil then
 			local sh = getCTEntryHeight(ctNodeStart);
-			local eh = getCTEntryHeight(ctNodeEnd); 
+			local eh = getCTEntryHeight(ctNodeEnd);
 			-- height is stored in 5ft units, we're working in raw units
-			heightDistance = math.abs(eh-sh)/5; 
+			heightDistance = math.abs(eh-sh)/5;
 		end
 
-		local lenX = math.floor(math.abs(snapSX - snapEX)/gridSize); 
-		local lenY = math.floor(math.abs(snapSY - snapEY)/gridSize); 
-		local baseDistance = math.max(lenX,lenY) + math.floor(math.min(lenX,lenY)/2); 
+		local lenX = math.floor(math.abs(snapSX - snapEX)/gridSize);
+		local lenY = math.floor(math.abs(snapSY - snapEY)/gridSize);
+		local baseDistance = math.max(lenX,lenY) + math.floor(math.min(lenX,lenY)/2);
 		local distance = baseDistance;
 
-		--local offX,offY = getGridOffset(); 
-		--Debug.console('offX: ' .. offX .. ' offY: ' .. offY); 
+		--local offX,offY = getGridOffset();
+		--Debug.console('offX: ' .. offX .. ' offY: ' .. offY);
 
 
-		--Debug.console('baseDistance: ' .. baseDistance .. ' heightDistance: ' .. heightDistance); 
+		--Debug.console('baseDistance: ' .. baseDistance .. ' heightDistance: ' .. heightDistance);
 		if heightDistance > 0 then
-			distance = math.sqrt((baseDistance^2)+(heightDistance^2)); 
-			distance = math.floor((distance*10)+0.5)/10; 
+			distance = math.sqrt((baseDistance^2)+(heightDistance^2));
+			distance = math.floor((distance*10)+0.5)/10;
 		end
-		releaseMeasureSemaphore(); 		
+		releaseMeasureSemaphore();
 
 		--Debug.chat('' .. (distance*5) .. ' ft');
-		return ('' .. (distance*5) .. ' ft'); 
-		--return ('' .. (distance*5) .. ' ft' .. ' SH: ' .. sh .. ' EH: ' .. eh); 
-		--return ('' .. distance .. ' units'); 
-		--return ('X: ' .. lenX .. ' Y: ' .. lenY); 
+		return ('' .. (distance*5) .. ' ft');
+		--return ('' .. (distance*5) .. ' ft' .. ' SH: ' .. sh .. ' EH: ' .. eh);
+		--return ('' .. distance .. ' units');
+		--return ('X: ' .. lenX .. ' Y: ' .. lenY);
 	end
-	return ''; 
+	return '';
 end

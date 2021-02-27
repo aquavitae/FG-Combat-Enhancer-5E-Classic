@@ -133,7 +133,7 @@ function onTypeChanged()
 end
 
 function onHealthChanged()
-	local sColor = ActorManager2.getWoundColor("ct", getDatabaseNode());
+	local sColor = ActorHealthManager.getHealthColor(getDatabaseNode());
 	updateDisplay();
 	wounds.setColor(sColor);
 	status.setColor(sColor);

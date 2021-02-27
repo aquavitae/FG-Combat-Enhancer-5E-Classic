@@ -206,7 +206,7 @@ function onSortCompare(node1, node2)
 	if fCustomSort then
 		return not fCustomSort(node1, node2);
 	end
-	
+
 	return not sortfuncSimple(node1, node2);
 end
 
@@ -277,7 +277,7 @@ function getCTFromNode(varNode)
 	else
 		return nil, "";
 	end
-	
+
 	-- Check for exact CT match
 	for _,v in pairs(getCombatantNodes()) do
 		if v.getNodeName() == sNode then
@@ -305,7 +305,7 @@ function getCTFromTokenRef(vContainer, nId)
 	else
 		return nil;
 	end
-	
+
 	for _,v in pairs(getCombatantNodes()) do
 		local sCTContainerName = DB.getValue(v, "tokenrefnode", "");
 		local nCTId = tonumber(DB.getValue(v, "tokenrefid", "")) or 0;
@@ -313,7 +313,7 @@ function getCTFromTokenRef(vContainer, nId)
 			return v;
 		end
 	end
-	
+
 	return nil;
 end
 
@@ -321,7 +321,7 @@ function getCTFromToken(token)
 	if not token then
 		return nil;
 	end
-	
+
 	local nodeContainer = token.getContainerNode();
 	local nID = token.getId();
 
@@ -335,19 +335,19 @@ function getTokenFromCT(vEntry)
 	elseif type(vEntry) == "databasenode" then
 		nodeCT = vEntry;
 	end
-	
+
 	if not nodeCT then
 		return nil;
 	end
-	
+
 	return Token.getToken(DB.getValue(nodeCT, "tokenrefnode", ""), DB.getValue(nodeCT, "tokenrefid", ""));
 end
 
 function getCurrentUserCT()
-	if User.isHost() then
+	if Session.isHost then
 		return getActiveCT();
 	end
-	
+
 	-- If active identity is owned, then use that one
 	local nodeActive = getActiveCT();
 	local sClass, sRecord = DB.getValue(nodeActive, "link", "npc", "");
@@ -359,7 +359,7 @@ function getCurrentUserCT()
 			end
 		end
 	end
-	
+
 	-- Otherwise, use active identity (if any)
 	local sID = User.getCurrentIdentity();
 	if sID then
@@ -394,7 +394,7 @@ function isCTHidden(vEntry)
 	if not nodeCT then
 		return false;
 	end
-	
+
 	if DB.getValue(nodeCT, "friendfoe", "") == "friend" then
 		return false;
 	end
@@ -431,15 +431,15 @@ function sortfuncSimple(node1, node2)
 end
 
 function sortfuncStandard(node1, node2)
-	local bHost = User.isHost();
+	local bHost = Session.isHost;
 	local sOptCTSI = OptionsManager.getOption("CTSI");
-	
+
 	local sFaction1 = DB.getValue(node1, "friendfoe", "");
 	local sFaction2 = DB.getValue(node2, "friendfoe", "");
-	
+
 	local bShowInit1 = bHost or ((sOptCTSI == "friend") and (sFaction1 == "friend")) or (sOptCTSI == "on");
 	local bShowInit2 = bHost or ((sOptCTSI == "friend") and (sFaction2 == "friend")) or (sOptCTSI == "on");
-	
+
 	if bShowInit1 ~= bShowInit2 then
 		if bShowInit1 then
 			return true;
@@ -463,7 +463,7 @@ function sortfuncStandard(node1, node2)
 			end
 		end
 	end
-	
+
 	local sValue1 = DB.getValue(node1, "name", "");
 	local sValue2 = DB.getValue(node2, "name", "");
 	if sValue1 ~= sValue2 then
@@ -474,16 +474,16 @@ function sortfuncStandard(node1, node2)
 end
 
 function sortfuncDnD(node1, node2)
-	local bHost = User.isHost();
+	local bHost = Session.isHost;
 	local sOptCTSI = OptionsManager.getOption("CTSI");
 	local sOptCTSI = OptionsManager.getOption("CTSI");
-	
+
 	local sFaction1 = DB.getValue(node1, "friendfoe", "");
 	local sFaction2 = DB.getValue(node2, "friendfoe", "");
-	
+
 	local bShowInit1 = bHost or ((sOptCTSI == "friend") and (sFaction1 == "friend")) or (sOptCTSI == "on");
 	local bShowInit2 = bHost or ((sOptCTSI == "friend") and (sFaction2 == "friend")) or (sOptCTSI == "on");
-	
+
 	if bShowInit1 ~= bShowInit2 then
 		if bShowInit1 then
 			return true;
@@ -497,7 +497,7 @@ function sortfuncDnD(node1, node2)
 			if nValue1 ~= nValue2 then
 				return nValue1 > nValue2;
 			end
-			
+
 			nValue1 = DB.getValue(node1, "init", 0);
 			nValue2 = DB.getValue(node2, "init", 0);
 			if nValue1 ~= nValue2 then
@@ -513,7 +513,7 @@ function sortfuncDnD(node1, node2)
 			end
 		end
 	end
-	
+
 	local sValue1 = DB.getValue(node1, "name", "");
 	local sValue2 = DB.getValue(node2, "name", "");
 	if sValue1 ~= sValue2 then
@@ -564,7 +564,7 @@ function addGMIdentity(nodeEntry)
 	if OptionsManager.isOption("CTAV", "on") then
 		local sName = ActorManager.getDisplayName(nodeEntry);
 		local sClass,_ = DB.getValue(nodeEntry, "link", "", "");
-		
+
 		if sClass == "charsheet" or sName == "" then
 			GmIdentityManager.activateGMIdentity();
 		else
@@ -594,40 +594,40 @@ function getTurnIcon(nodeEntry)
 	if actor then
 		return "portrait_" .. actor.sName .. "_chat";
 	end
-	return ''; 
+	return '';
 	-- get node
 end
 
 function getFactionIcon(nodeEntry)
-	local nodeFaction = nodeEntry.getChild('friendfoe'); 
-	local nodeStatus = nodeEntry.getChild('status'); 
-	local sFaction = nodeFaction.getValue(); 
-	local sStatus = nodeStatus.getValue(); 
-	local retval = 'turn_flag_foe'; 
+	local nodeFaction = nodeEntry.getChild('friendfoe');
+	local nodeStatus = nodeEntry.getChild('status');
+	local sFaction = nodeFaction.getValue();
+	local sStatus = nodeStatus.getValue();
+	local retval = 'turn_flag_foe';
 
 	if sFaction == 'foe' then
-		retval = 'turn_flag_foe'; 
+		retval = 'turn_flag_foe';
 		if sStatus == 'Dying' or sStatus == 'Dead' then
-			retval = 'turn_flag_foe_dying'; 
+			retval = 'turn_flag_foe_dying';
 		end
 	elseif sFaction == 'friend' then
-		retval = 'turn_flag_friend'; 
+		retval = 'turn_flag_friend';
 	elseif sFaction == 'neutral' then
-		retval = 'turn_flag_neutral'; 
+		retval = 'turn_flag_neutral';
 	else
-		retval = 'turn_flag_none'; 
+		retval = 'turn_flag_none';
 	end
 
-	--Debug.console('COMBAT MANAGER TURN FACTION: ' .. sFaction); 
+	--Debug.console('COMBAT MANAGER TURN FACTION: ' .. sFaction);
 
-	return retval; 
+	return retval;
 end
 
 -- open entry if npc
 function openNPCEntry(sClass,nodeEntry)
-	if sClass == 'npc' and User.isHost()then
+	if sClass == 'npc' and Session.isHost then
 		-- open the window
-		Interface.openWindow('npc',nodeEntry); 
+		Interface.openWindow('npc',nodeEntry);
 	end
 end
 
@@ -636,7 +636,7 @@ function showTurnMessage(nodeEntry, bActivate, bSkipBell)
 	local sName = ActorManager.getDisplayName(nodeEntry);
 	local sClass, sRecord = DB.getValue(nodeEntry, "link", "", "");
 
-	--openNPCEntry(sClass,nodeEntry); 
+	--openNPCEntry(sClass,nodeEntry);
 
 	--local msg = {font = "systemfont", icon = "turn_flag"};
 	local msg = {font = "systemfont", icon = getFactionIcon(nodeEntry)};
@@ -649,7 +649,7 @@ function showTurnMessage(nodeEntry, bActivate, bSkipBell)
 	end
 	if sClass == "charsheet" then
 		Comm.deliverChatMessage(msg);
-		
+
 		if bActivate and not bSkipBell and OptionsManager.isOption("RING", "on") then
 			if sRecord ~= "" then
 				local nodePC = DB.findNode(sRecord);
@@ -676,7 +676,7 @@ function requestActivation(nodeEntry, bSkipBell)
 	for _,v in pairs(getCombatantNodes()) do
 		DB.setValue(v, "active", "number", 0);
 	end
-	
+
 	-- Set active flag
 	DB.setValue(nodeEntry, "active", "number", 1);
 
@@ -701,17 +701,17 @@ function centerOnToken(nodeEntry)
 end
 
 function nextActor(bSkipBell, bNoRoundAdvance)
-	if not User.isHost() then
+	if not Session.isHost then
 		return;
 	end
 
 	local nodeActive = getActiveCT();
 	local nIndexActive = 0;
-	
+
 	-- Check the skip hidden NPC option
 	local bSkipHidden = OptionsManager.isOption("CTSH", "on");
 	-- Check the ship for actors that haven't rolled initiative
-	local bSkipNonInitiativedActors = OptionsManager.isOption("CE_SNIA", "on");	
+	local bSkipNonInitiativedActors = OptionsManager.isOption("CE_SNIA", "on");
 
 	-- Determine the next actor
 	local nodeNext = nil;
@@ -725,30 +725,30 @@ function nextActor(bSkipBell, bNoRoundAdvance)
 				end
 			end
 		end
-		if bSkipHidden or bSkipNonInitiativedActors then			
+		if bSkipHidden or bSkipNonInitiativedActors then
 			local nIndexNext = 0;
 			for i = nIndexActive + 1, #aEntries do
 				if DB.getValue(aEntries[i], "friendfoe", "") == "friend" then
 					nIndexNext = i;
 
-					-- check if initiative is 0 value (default in db if no entry). if so set index to 1 (first actor) and exit function, as all non-iniatived actors will be piled at the bottom of the CT				
-					local initiative = DB.getValue(aEntries[i], 'initresult');					
+					-- check if initiative is 0 value (default in db if no entry). if so set index to 1 (first actor) and exit function, as all non-iniatived actors will be piled at the bottom of the CT
+					local initiative = DB.getValue(aEntries[i], 'initresult');
 					if initiative == 0 then
 						nIndexActive = 0;
-						Debug.console('CT actor has no rolled initiative');						
-					end						
+						Debug.console('CT actor has no rolled initiative');
+					end
 
-					break;					
+					break;
 				else
 					if not isCTHidden(aEntries[i]) then
 						nIndexNext = i;
 
-						-- check if initiative is 0 value (default in db if no entry). if so set index to 1 (first actor) and exit function, as all non-iniatived actors will be piled at the bottom of the CT				
-						local initiative = DB.getValue(aEntries[i], 'initresult');						
+						-- check if initiative is 0 value (default in db if no entry). if so set index to 1 (first actor) and exit function, as all non-iniatived actors will be piled at the bottom of the CT
+						local initiative = DB.getValue(aEntries[i], 'initresult');
 						if initiative == 0 then
 							nIndexNext = 0;
-							Debug.console('CT actor has no rolled initiative');						
-						end							
+							Debug.console('CT actor has no rolled initiative');
+						end
 
 						break;
 					end
@@ -763,7 +763,7 @@ function nextActor(bSkipBell, bNoRoundAdvance)
 		else
 			nodeNext = aEntries[nIndexActive + 1];
 		end
-		
+
 		-- if nodeActive then
 			-- for i = 1,#aEntries do
 				-- if aEntries[i] == nodeActive then
@@ -779,29 +779,29 @@ function nextActor(bSkipBell, bNoRoundAdvance)
 	if nodeNext then
 		-- End turn for current actor
 		onTurnEndEvent(nodeActive);
-	
+
 		-- Process effects in between current and next actors
 		if nodeActive then
 			onInitChangeEvent(nodeActive, nodeNext);
 		else
 			onInitChangeEvent(nil, nodeNext);
 		end
-		
+
 		-- Start turn for next actor
 		requestActivation(nodeNext, bSkipBell);
 		onTurnStartEvent(nodeNext);
 	elseif not bNoRoundAdvance then
-		if (bSkipHidden == true) or (bSkipNonInitiativedActors == true) then			
+		if (bSkipHidden == true) or (bSkipNonInitiativedActors == true) then
 			for i = nIndexActive + 1, #aEntries do
 				showTurnMessage(aEntries[i], false);
-			end			
+			end
 		end
 		nextRound(1);
 	end
 end
 
 function nextRound(nRounds)
-	if not User.isHost() then
+	if not Session.isHost then
 		return;
 	end
 
@@ -825,7 +825,7 @@ function nextRound(nRounds)
 				onTurnEndEvent(aEntries[i]);
 			end
 		end
-		
+
 		onInitChangeEvent(nodeActive);
 
 		nStartCounter = nStartCounter + 1;
@@ -841,9 +841,9 @@ function nextRound(nRounds)
 			onTurnStartEvent(aEntries[i]);
 			onTurnEndEvent(aEntries[i]);
 		end
-		
+
 		onInitChangeEvent();
-		
+
 		-- Announce round
 		nCurrent = nCurrent + 1;
 		local msg = {font = "end_turn", icon = "footer_wide"};
@@ -853,10 +853,10 @@ function nextRound(nRounds)
 
 	-- Update round counter
 	DB.setValue(CT_ROUND, "number", nCurrent);
-	
+
 	-- Custom round start callback (such as per round initiative rolling)
 	onRoundStartEvent(nCurrent);
-	
+
 	-- Check option to see if we should advance to first actor or stop on round start
 	if OptionsManager.isOption("RNDS", "off") then
 		local bSkipBell = (nRounds > 1);
@@ -878,13 +878,13 @@ function onDrop(nodetype, nodename, draginfo)
 
 		-- Faction changes
 		if sDragType == "combattrackerff" then
-			if User.isHost() then
+			if Session.isHost then
 				DB.setValue(ActorManager.getCTNode(rTarget), "friendfoe", "string", draginfo.getStringData());
 				return true;
 			end
 		-- Actor targeting
 		elseif sDragType == "targeting" then
-			if User.isHost() then
+			if Session.isHost then
 				local _,sNodeSourceCT = draginfo.getShortcutData();
 				TargetingManager.addCTTarget(DB.findNode(sNodeSourceCT), ActorManager.getCTNode(rTarget));
 				return true;
@@ -896,7 +896,7 @@ function onDrop(nodetype, nodename, draginfo)
 			return true;
 		end
 	end
-	
+
 	-- Actions
 	local sDragType = draginfo.getType();
 	if StringManager.contains(GameSystem.targetactions, sDragType) then
@@ -915,7 +915,7 @@ function addPC(nodePC)
 	if fCustomAddPC then
 		return fCustomAddPC(nodePC);
 	end
-	
+
 	-- Parameter validation
 	if not nodePC then
 		return;
@@ -926,7 +926,7 @@ function addPC(nodePC)
 	if not nodeEntry then
 		return;
 	end
-	
+
 	-- Set up the CT specific information
 	DB.setValue(nodeEntry, "link", "windowreference", "charsheet", nodePC.getNodeName());
 	DB.setValue(nodeEntry, "friendfoe", "string", "friend");
@@ -934,9 +934,9 @@ function addPC(nodePC)
 	-- add ownership
 	--[[
 	local sOwner = nodePC.getOwner();
-	Debug.console('CM-addPC: owner of ' .. nodePC.getPath() .. ' is: ' .. tostring(sOwner)); 
+	Debug.console('CM-addPC: owner of ' .. nodePC.getPath() .. ' is: ' .. tostring(sOwner));
 	if sOwner then
-		nodeEntry.createChild('effects').addHolder(sOwner,true); 
+		nodeEntry.createChild('effects').addHolder(sOwner,true);
 	end
 	]]--
 
@@ -949,7 +949,7 @@ end
 
 function onBattleNPCLoadCallback(aCustom, bFoundWildcard)
 	addBattle(aCustom.nodeBattle);
-	
+
 	if bFoundWildcard then
 		Comm.SystemMessage(Interface.getString("module_message_missinglink_wildcard_battle"));
 	end
@@ -991,11 +991,11 @@ function addBattle(nodeBattle)
 		wSelect.initialize(aModulesToLoad, onBattleNPCLoadCallback, { nodeBattle = nodeBattle });
 		return;
 	end
-	
+
 	if fCustomAddBattle then
 		return fCustomAddBattle(nodeBattle);
 	end
-	
+
 	-- Cycle through the NPC list, and add them to the tracker
 	for _, vNPCItem in pairs(DB.getChildren(nodeBattle, sTargetNPCList)) do
 		-- Get link database node
@@ -1005,28 +1005,28 @@ function addBattle(nodeBattle)
 			nodeNPC = DB.findNode(sRecord);
 		end
 		local sName = DB.getValue(vNPCItem, "name", "");
-		
+
 		if nodeNPC then
 			local aPlacement = {};
 			for _,vPlacement in pairs(DB.getChildren(vNPCItem, "maplink")) do
 				local rPlacement = {};
 				local _, sRecord = DB.getValue(vPlacement, "imageref", "", "");
-				
+
 				-- *** Enhanced Images Extension ***
 				-- See if the tokens link is on the image.id-XXXXX.image layer or image.id-XXXXX.play_image layer.
 				if string.find(sRecord, "play_image") == nil then
 					-- Change .image layer to .play_image
 					local sRecordPlayImage, _ = string.gsub(sRecord, ".image", ".play_image")
 					sRecord = sRecordPlayImage;
-				end			
-				-- *** end extension code ***				
-				
+				end
+				-- *** end extension code ***
+
 				rPlacement.imagelink = sRecord;
 				rPlacement.imagex = DB.getValue(vPlacement, "imagex", 0);
 				rPlacement.imagey = DB.getValue(vPlacement, "imagey", 0);
 				table.insert(aPlacement, rPlacement);
 			end
-			
+
 			local nCount = DB.getValue(vNPCItem, "count", 0);
 			for i = 1, nCount do
 				local nodeEntry = addNPC(sClass, nodeNPC, sName);
@@ -1047,8 +1047,8 @@ function addBattle(nodeBattle)
 					if sToken ~= "" then
 						DB.setValue(nodeEntry, "token", "token", sToken);
 						-- hide the added token as prior to this, all masked tokens were hidden instead
-						DB.setValue(nodeEntry, "tokenvis", "number", 0); 
-						
+						DB.setValue(nodeEntry, "tokenvis", "number", 0);
+
 						if aPlacement[i] and aPlacement[i].imagelink ~= "" then
 							TokenManager.setDragTokenUnits(DB.getValue(nodeEntry, "space"));
 							local tokenAdded = Token.addToken(aPlacement[i].imagelink, sToken, aPlacement[i].imagex, aPlacement[i].imagey);
@@ -1056,13 +1056,13 @@ function addBattle(nodeBattle)
 							tokenAdded.setVisible(false);
 							TokenManager.endDragTokenWithUnits(nodeEntry);
 							if tokenAdded then
-								local nodeRef = nodeEntry.getChild('tokenrefid'); 
+								local nodeRef = nodeEntry.getChild('tokenrefid');
 								TokenManager.linkToken(nodeEntry, tokenAdded);
-								TokenManager.updateAttributes(nodeRef); 
+								TokenManager.updateAttributes(nodeRef);
 							end
 						end
 					end
-					
+
 					-- Set identification state from encounter record, and disable source link to prevent overriding ID for existing CT entries when identification state changes
 					local sSourceClass,sSourceRecord = DB.getValue(nodeEntry, "sourcelink", "", "");
 					DB.setValue(nodeEntry, "sourcelink", "windowreference", "", "");
@@ -1076,7 +1076,7 @@ function addBattle(nodeBattle)
 			ChatManager.SystemMessage(Interface.getString("ct_error_addnpcfail2") .. " (" .. sName .. ")");
 		end
 	end
-	
+
 	Interface.openWindow("combattracker_host", "combattracker");
 end
 
@@ -1096,7 +1096,7 @@ function randomName(sBaseName)
 			table.insert(aNames, DB.getValue(v, "name", ""));
 		end
 	end
-	
+
 	local nRandomRange = getCombatantCount() * 2;
 	local sNewName = sBaseName;
 	local nSuffix;
@@ -1117,9 +1117,9 @@ function addNPC(sClass, nodeNPC, sName)
 	if fCustomAddNPC then
 		return fCustomAddNPC(sClass, nodeNPC, sName);
 	end
-	
+
 	local nodeEntry, nodeLastMatch = addNPCHelper(nodeNPC, sName);
-	
+
 	return nodeEntry;
 end
 
@@ -1131,7 +1131,7 @@ function addNPCHelper(nodeNPC, sName)
 
 	-- Setup
 	local aCurrentCombatants = getCombatantNodes();
-	
+
 	-- Get the name to use for this addition
 	local bIsCTNPC = (UtilityManager.getRootNodeName(nodeNPC) == CT_MAIN_PATH);
 	local sNameLocal = sName;
@@ -1147,7 +1147,7 @@ function addNPCHelper(nodeNPC, sName)
 	elseif bIsCTNPC then
 		sNonIDLocal = stripCreatureNumber(sNonIDLocal);
 	end
-	
+
 	local nLocalID = DB.getValue(nodeNPC, "isidentified", 1);
 	if not bIsCTNPC then
 		local sSourcePath = nodeNPC.getPath()
@@ -1167,7 +1167,7 @@ function addNPCHelper(nodeNPC, sName)
 			end
 		end
 	end
-	
+
 	local nodeLastMatch = nil;
 	if sNameLocal:len() > 0 then
 		-- Determine the number of NPCs with the same name
@@ -1179,7 +1179,7 @@ function addNPCHelper(nodeNPC, sName)
 			local sTemp, sNumber = stripCreatureNumber(sEntryName);
 			if sTemp == sNameLocal then
 				nodeLastMatch = v;
-				
+
 				local nNumber = tonumber(sNumber) or 0;
 				if nNumber > 0 then
 					nNameHigh = math.max(nNameHigh, nNumber);
@@ -1189,12 +1189,12 @@ function addNPCHelper(nodeNPC, sName)
 				end
 			end
 		end
-	
+
 		-- If multiple NPCs of same name, then figure out whether we need to adjust the name based on options
 		local sOptNNPC = OptionsManager.getOption("NNPC");
 		if sOptNNPC ~= "off" then
 			local nNameCount = #aMatchesWithNumber + #aMatchesToNumber;
-			
+
 			for _,v in ipairs(aMatchesToNumber) do
 				local sEntryName = DB.getValue(v, "name", "");
 				local sEntryNonIDName = DB.getValue(v, "nonid_name", "");
@@ -1211,7 +1211,7 @@ function addNPCHelper(nodeNPC, sName)
 					DB.setValue(v, "nonid_name", "string", sEntryNonIDName .. " " .. nSuffix);
 				end
 			end
-			
+
 			if nNameCount > 0 then
 				if sOptNNPC == "append" then
 					nNameHigh = nNameHigh + 1;
@@ -1225,7 +1225,7 @@ function addNPCHelper(nodeNPC, sName)
 			end
 		end
 	end
-	
+
 	DB.createNode(CT_LIST);
 	local nodeEntry = DB.createChild(CT_LIST);
 	if not nodeEntry then
@@ -1238,12 +1238,12 @@ function addNPCHelper(nodeNPC, sName)
 	DB.setValue(nodeEntry, "tokenrefid", "string", "");
 	DB.setValue(nodeEntry, "tokenrefnode", "string", "");
 	DB.deleteChildren(nodeEntry, "effects");
-	
+
 	-- Set the final name value
 	DB.setValue(nodeEntry, "name", "string", sNameLocal);
 	DB.setValue(nodeEntry, "nonid_name", "string", sNonIDLocal);
 	DB.setValue(nodeEntry, "isidentified", "number", nLocalID);
-	
+
 	-- Lock NPC record view by default when copying to CT
 	DB.setValue(nodeEntry, "locked", "number", 1);
 
@@ -1254,7 +1254,7 @@ function addNPCHelper(nodeNPC, sName)
 	if not bIsCTNPC then
 		DB.setValue(nodeEntry, "sourcelink", "windowreference", "npc", nodeNPC.getPath());
 	end
-	
+
 	-- Calculate space/reach
 	local nSpace, nReach = getNPCSpaceReach(nodeNPC);
 	DB.setValue(nodeEntry, "space", "number", nSpace);
@@ -1271,7 +1271,7 @@ function addNPCHelper(nodeNPC, sName)
 		end
 		DB.setValue(nodeEntry, "token", "token", sToken);
 	end
-	
+
 	return nodeEntry, nodeLastMatch;
 end
 
@@ -1279,7 +1279,7 @@ function getNPCSpaceReach(nodeNPC)
 	if fCustomNPCSpaceReach then
 		return fCustomNPCSpaceReach(nodeNPC);
 	end
-	
+
 	local nDU = GameSystem.getDistanceUnitsPerGrid();
 	local nSpace = (tonumber(DB.getValue(nodeNPC, "space", nDU)) or nDU);
 	local nReach = (tonumber(DB.getValue(nodeNPC, "reach", nDU)) or nDU);
@@ -1295,13 +1295,13 @@ function resetInit()
 	for _,v in pairs(getCombatantNodes()) do
 		DB.setValue(v, "active", "number", 0);
 	end
-	
+
 	-- Clear GM identity additions (based on option)
 	clearGMIdentity();
 
 	-- Reset the round counter
 	DB.setValue(CT_ROUND, "number", 1);
-	
+
 	onCombatResetEvent();
 end
 
@@ -1352,7 +1352,7 @@ function rollTypeInit(sType, fRollCombatantEntryInit, ...)
 				bRoll = false;
 			end
 		end
-		
+
 		if bRoll then
 			DB.setValue(v, "initresult", "number", -10000);
 		end
@@ -1368,7 +1368,7 @@ function rollTypeInit(sType, fRollCombatantEntryInit, ...)
 				bRoll = false;
 			end
 		end
-		
+
 		if bRoll then
 			fRollCombatantEntryInit(v, ...);
 		end
@@ -1380,14 +1380,14 @@ end
 --
 
 function handleFactionDropOnImage(draginfo, imagecontrol, x, y)
-	if not User.isHost() then return; end
-	
+	if not Session.isHost then return; end
+
 	-- Determine image viewpoint
 	-- Handle zoom factor (>100% or <100%) and offset drop coordinates
 	local vpx, vpy, vpz = imagecontrol.getViewpoint();
 	x = x / vpz;
 	y = y / vpz;
-	
+
 	-- If grid, then snap drop point and adjust drop spread
 	local nDropSpread = 15;
 	if imagecontrol.hasGrid() then
@@ -1408,8 +1408,8 @@ function handleFactionDropOnImage(draginfo, imagecontrol, x, y)
 
 				-- Update token references
 				replaceCombatantToken(v, tokenMap);
-				TokenManager.updateAttributes(v.getChild('tokenrefid')); 
-				
+				TokenManager.updateAttributes(v.getChild('tokenrefid'));
+
 				-- Offset drop coordinates for next token
 				if x >= (nDropSpread * 1.5) then
 					x = x - nDropSpread;
@@ -1420,7 +1420,7 @@ function handleFactionDropOnImage(draginfo, imagecontrol, x, y)
 			end
 		end
 	end
-	
+
 	return true;
 end
 

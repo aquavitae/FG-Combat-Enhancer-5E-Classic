@@ -55,19 +55,19 @@ end
 function onFilter(w)
 	if window.filter then
 		local sFilter = window.filter.getValue();
-		local dbNode = w.getDatabaseNode(); 
-		--Debug.console('minifilter: ' .. w.getClass() .. ' -- ' .. sFilter); 
+		local dbNode = w.getDatabaseNode();
+		--Debug.console('minifilter: ' .. w.getClass() .. ' -- ' .. sFilter);
 		if sFilter ~= "" then
 			if not w.label.getValue():upper():find(sFilter:upper(), 1, true) then
 				return false;
 			end
 		end
-		if not User.isHost() and DB.getValue(dbNode,'isgmonly',0) == 1 then
+		if not Session.isHost and DB.getValue(dbNode,'isgmonly',0) == 1 then
 			return false;
 		end
 		return true;
 	else
-		--Debug.console('filter not ready!'); 
+		--Debug.console('filter not ready!');
 	end
 end
 

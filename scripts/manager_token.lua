@@ -8,7 +8,7 @@ local bDisplayDefaultEffects = false;
 local fGetEffectInfo = null;
 
 function onInit()
-	if User.isHost() then
+	if Session.isHost then
 		Token.onContainerChanged = onContainerChanged;
 		Token.onTargetUpdate = onTargetUpdate;
 
@@ -36,8 +36,8 @@ function onInit()
 	CombatManager.addCombatantFieldChangeHandler("name", "onUpdate", updateName);
 	CombatManager.addCombatantFieldChangeHandler("nonid_name", "onUpdate", updateName);
 	CombatManager.addCombatantFieldChangeHandler("isidentified", "onUpdate", updateName);
-	
-	DB.addHandler("options.TNAM", "onUpdate", onOptionChanged);	
+
+	DB.addHandler("options.TNAM", "onUpdate", onOptionChanged);
 end
 
 function linkToken(nodeCT, newTokenInstance)
@@ -45,7 +45,7 @@ function linkToken(nodeCT, newTokenInstance)
 	if newTokenInstance then
 		nodeContainer = newTokenInstance.getContainerNode();
 	end
-	
+
 	if nodeContainer then
 		DB.setValue(nodeCT, "tokenrefnode", "string", nodeContainer.getNodeName());
 		DB.setValue(nodeCT, "tokenrefid", "string", newTokenInstance.getId());
@@ -61,8 +61,8 @@ end
 	Check the token reference if it's still valid.
 ]]--
 function checkTokenInstance(newTokenInstance)
-	local a = newTokenInstance.getId(); 
-	local b = newTokenInstance.getScale(); 
+	local a = newTokenInstance.getId();
+	local b = newTokenInstance.getScale();
 end
 
 function onOptionChanged(nodeOption)
@@ -80,7 +80,7 @@ function onCombatantDelete(nodeCT)
 			return;
 		end
 	end
-	
+
 	local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 	if tokenCT then
 		local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
@@ -113,7 +113,7 @@ end
 function onTokenDelete(tokenMap)
 	ImageManager.onTokenDelete(tokenMap);
 
-	if User.isHost() then
+	if Session.isHost then
 		CombatManager.onTokenDelete(tokenMap);
 		PartyManager.onTokenDelete(tokenMap);
 	end
@@ -150,9 +150,9 @@ function onScaleChanged(tokenCT)
 
 	if nodeCT then
 		updateNameScale(tokenCT);
-		if bDisplayDefaultHealth then 
+		if bDisplayDefaultHealth then
 			local nPercentWounded = fGetHealthInfo(nodeCT);
-			updateHealthBarScale(tokenCT, nPercentWounded); 
+			updateHealthBarScale(tokenCT, nPercentWounded);
 		end
 		if bDisplayDefaultEffects then
 			updateEffectsHelper(tokenCT, nodeCT);
@@ -170,7 +170,7 @@ function onWheelHelper(tokenCT, notches)
 	if not tokenCT then
 		return;
 	end
-	
+
 	if Input.isShiftPressed() then
 		newscale = math.floor(tokenCT.getScale() + notches);
 		if newscale < 1 then
@@ -182,7 +182,7 @@ function onWheelHelper(tokenCT, notches)
 			newscale = 0.1;
 		end
 	end
-	
+
 	tokenCT.setScale(newscale);
 end
 
@@ -200,7 +200,7 @@ function onDrop(tokenCT, draginfo)
 	else
 		if draginfo.getType() == "targeting" then
 			ChatManager.SystemMessage(Interface.getString("ct_error_targetingunlinkedtoken"));
-			return true; 
+			return true;
 		end
 	end
 end
@@ -239,11 +239,11 @@ function onHover(tokenMap, bOver)
 				end
 			end
 		end
-					
-		if User.isHost() then
-			hilightHover(tokenMap, bOver); 
+
+		if Session.isHost then
+			hilightHover(tokenMap, bOver);
 		end
-		
+
 		if TokenManager2 and TokenManager2.onHover then
 			TokenManager2.onHover(tokenMap, nodeCT, bOver);
 		end
@@ -252,35 +252,35 @@ end
 
 function hilightHover(tokenMap, bOver)
 	local nodeActiveCT = CombatManager.getActiveCT();
-	local nodeCT = CombatManager.getCTFromToken(tokenMap); 
+	local nodeCT = CombatManager.getCTFromToken(tokenMap);
 	local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 
 	if bOver and tokenCT then
 		-- add blue underlay if not active
 		if nodeActiveCT and nodeActiveCT.getNodeName() ~= nodeCT.getNodeName() then
-			tokenCT.removeAllUnderlays(); 
-			local space = nodeCT.getChild('space');  
-			if space == nil then 
+			tokenCT.removeAllUnderlays();
+			local space = nodeCT.getChild('space');
+			if space == nil then
 				space = 1;
 			else
-				space = space.getValue()/5/2+0.5; 
+				space = space.getValue()/5/2+0.5;
 			end
 			tokenCT.addUnderlay(space, CombatEnhancer.TOKENUNDERLAYCOLOR_3);
 		end
 
 	elseif tokenCT then
 		-- remove all underlays, if active then put back active underlay
-		tokenCT.removeAllUnderlays(); 
+		tokenCT.removeAllUnderlays();
 		if nodeActiveCT and nodeActiveCT.getNodeName() == nodeCT.getNodeName() then
 			local tokenActiveCT = CombatManager.getTokenFromCT(nodeActiveCT);
 			if tokenActiveCT then
-				local space = nodeActiveCT.getChild('space');  
-				if space == nil then 
+				local space = nodeActiveCT.getChild('space');
+				if space == nil then
 					space = 1;
 				else
-					space = space.getValue()/5/2+0.5; 
+					space = space.getValue()/5/2+0.5;
 				end
-				tokenCT.addUnderlay(space, CombatEnhancer.TOKENUNDERLAYCOLOR_1); 
+				tokenCT.addUnderlay(space, CombatEnhancer.TOKENUNDERLAYCOLOR_1);
 			end
 		end
 	end
@@ -291,7 +291,7 @@ function onDoubleClick(tokenMap, vImage)
 	local nodeCT = CombatManager.getCTFromToken(tokenMap);
 	if Input.isShiftPressed() then
 		if nodeCT then
-			if User.isHost() then
+			if Session.isHost then
 				local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
 				if sRecord ~= "" then
 					Interface.openWindow(sClass, sRecord);
@@ -325,7 +325,7 @@ function onDoubleClick(tokenMap, vImage)
 			end
 		end
 	end
-	return true; 
+	return true;
 end
 
 function updateAttributesFromToken(tokenMap)
@@ -333,15 +333,15 @@ function updateAttributesFromToken(tokenMap)
 	if nodeCT then
 		updateAttributesHelper(tokenMap, nodeCT);
 	end
-	
-	if User.isHost() then
+
+	if Session.isHost then
 		local nodePS = PartyManager.getNodeFromToken(tokenMap);
 		if nodePS then
 			tokenMap.setTargetable(false);
 			tokenMap.setActivable(true);
 			tokenMap.setActive(false);
 			tokenMap.setVisible(true);
-			
+
 			tokenMap.setName(DB.getValue(nodePS, "name", ""));
 		end
 	end
@@ -356,27 +356,27 @@ function updateAttributes(nodeField)
 end
 
 function updateAttributesHelper(tokenCT, nodeCT)
-	if User.isHost() then
+	if Session.isHost then
 		tokenCT.setTargetable(true);
 		tokenCT.setActivable(true);
-		
+
 		if OptionsManager.isOption("TFAC", "on") then
 			tokenCT.setOrientationMode("facing");
 		else
 			tokenCT.setOrientationMode();
 		end
-		
+
 		updateActiveHelper(tokenCT, nodeCT);
 		updateFactionHelper(tokenCT, nodeCT);
 		updateSizeHelper(tokenCT, nodeCT);
 	else
 		updateOwnerHelper(tokenCT, nodeCT);
 	end
-	
+
 	updateNameHelper(tokenCT, nodeCT);
 	updateTooltip(tokenCT, nodeCT);
-	if bDisplayDefaultHealth then 
-		updateHealthHelper(tokenCT, nodeCT); 
+	if bDisplayDefaultHealth then
+		updateHealthHelper(tokenCT, nodeCT);
 	end
 	if bDisplayDefaultEffects then
 		updateEffectsHelper(tokenCT, nodeCT);
@@ -391,17 +391,17 @@ function updateTooltip(tokenCT, nodeCT)
 		TokenManager2.updateTooltip(tokenCT, nodeCT);
 		return;
 	end
-	
-	if User.isHost() then
+
+	if Session.isHost then
 		local aTooltip = {};
 		local sFaction = DB.getValue(nodeCT, "friendfoe", "");
-		
+
 		local sOptTNAM = OptionsManager.getOption("TNAM");
 		if sOptTNAM == "tooltip" then
 			local sName = ActorManager.getDisplayName(nodeCT);
 			table.insert(aTooltip, sName);
 		end
-		if bDisplayDefaultHealth then 
+		if bDisplayDefaultHealth then
 			local sOptTH;
 			if sFaction == "friend" then
 				sOptTH = OptionsManager.getOption("TPCH");
@@ -427,7 +427,7 @@ function updateTooltip(tokenCT, nodeCT)
 				end
 			end
 		end
-		
+
 		tokenCT.setName(table.concat(aTooltip, "\r"));
 	end
 end
@@ -443,10 +443,10 @@ end
 
 function updateNameHelper(tokenCT, nodeCT)
 	local sOptTNAM = OptionsManager.getOption("TNAM");
-	
+
 	local sName = ActorManager.getDisplayName(nodeCT);
 	local aWidgets = getWidgetList(tokenCT, "name");
-	
+
 	if sOptTNAM == "off" or sOptTNAM == "tooltip" then
 		for _, vWidget in pairs(aWidgets) do
 			vWidget.destroy();
@@ -512,7 +512,7 @@ function updateVisibility(nodeCT)
 	if tokenCT then
 		updateVisibilityHelper(tokenCT, nodeCT);
 	end
-	
+
 	if DB.getValue(nodeCT, "tokenvis", 0) == 0 then
 		TargetingManager.removeCTTargeted(nodeCT);
 	end
@@ -553,9 +553,9 @@ function updateOwner(nodePC)
 end
 
 function updateOwnerHelper(tokenCT, nodeCT)
-	if not User.isHost() then
+	if not Session.isHost then
 		local bOwned = false;
-		
+
 		local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
 		if DB.isOwner(sRecord) then
 			bOwned = true;
@@ -574,7 +574,7 @@ function updateActive(nodeField)
 end
 
 function updateActiveHelper(tokenCT, nodeCT)
-	if User.isHost() then
+	if Session.isHost then
 		if tokenCT.isActivable() then
 			local bActive = (DB.getValue(nodeCT, "active", 0) == 1);
 			if bActive then
@@ -590,12 +590,12 @@ function updateFaction(nodeFaction)
 	local nodeCT = nodeFaction.getParent();
 	local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 	if tokenCT then
-		if User.isHost() then
+		if Session.isHost then
 			updateFactionHelper(tokenCT, nodeCT);
 		end
 		updateTooltip(tokenCT, nodeCT);
-		if bDisplayDefaultHealth then 
-			updateHealthHelper(tokenCT, nodeCT); 
+		if bDisplayDefaultHealth then
+			updateHealthHelper(tokenCT, nodeCT);
 		end
 		if bDisplayDefaultEffects then
 			updateEffectsHelper(tokenCT, nodeCT);
@@ -627,7 +627,7 @@ end
 
 function updateSizeHelper(tokenCT, nodeCT)
 	local nDU = GameSystem.getDistanceUnitsPerGrid();
-	
+
 	local nSpace = math.ceil(DB.getValue(nodeCT, "space", nDU) / nDU);
 	local nHalfSpace = nSpace / 2;
 	local nReach = math.ceil(DB.getValue(nodeCT, "reach", nDU) / nDU) + nHalfSpace;
@@ -656,7 +656,7 @@ function updateSizeHelper(tokenCT, nodeCT)
 		tokenCT.addUnderlay(nHalfSpace, "2fffff00");
 	end
 	]]--
-	
+
 	-- Set grid spacing
 	tokenCT.setGridSize(nSpace);
 end
@@ -687,7 +687,7 @@ function getWidgetList(tokenCT, sSet)
 			end
 		end
 	end
-	
+
 	return aWidgets;
 end
 
@@ -719,12 +719,12 @@ function autoTokenScale(tokenMap)
 	if tokenMap.getScale() ~= 1 then
 		return;
 	end
-	
+
 	local w, h = tokenMap.getImageSize();
 	if w <= 0 or h <= 0 then
 		return;
 	end
-	
+
 	local aImage = tokenMap.getContainerNode().getValue();
 	if not aImage or not aImage.gridsize or (aImage.gridsize <= 0) then
 		return;
@@ -754,8 +754,8 @@ end
 -- Callback assumed input of:
 --		* nodeCT
 -- Assume callback function provided returns 3 parameters
---		* percent wounded (number), 
---		* status text (string), 
+--		* percent wounded (number),
+--		* status text (string),
 --		* status color (string, hex color)
 --
 
@@ -770,11 +770,11 @@ function addDefaultHealthFeatures(f, aHealthFields)
 		CombatManager.addCombatantFieldChangeHandler(sField, "onUpdate", updateHealth);
 	end
 
-	OptionsManager.registerOption2("TNPCH", false, "option_header_token", "option_label_TNPCH", "option_entry_cycler", 
+	OptionsManager.registerOption2("TNPCH", false, "option_header_token", "option_label_TNPCH", "option_entry_cycler",
 			{ labels = "option_val_tooltip|option_val_bar|option_val_barhover|option_val_dot|option_val_dothover", values = "tooltip|bar|barhover|dot|dothover", baselabel = "option_val_off", baseval = "off", default = "dot" });
-	OptionsManager.registerOption2("TPCH", false, "option_header_token", "option_label_TPCH", "option_entry_cycler", 
+	OptionsManager.registerOption2("TPCH", false, "option_header_token", "option_label_TPCH", "option_entry_cycler",
 			{ labels = "option_val_tooltip|option_val_bar|option_val_barhover|option_val_dot|option_val_dothover", values = "tooltip|bar|barhover|dot|dothover", baselabel = "option_val_off", baseval = "off", default = "dot" });
-	OptionsManager.registerOption2("WNDC", false, "option_header_combat", "option_label_WNDC", "option_entry_cycler", 
+	OptionsManager.registerOption2("WNDC", false, "option_header_combat", "option_label_WNDC", "option_entry_cycler",
 			{ labels = "option_val_detailed", values = "detailed", baselabel = "option_val_simple", baseval = "off", default = "off" });
 	DB.addHandler("options.TNPCH", "onUpdate", onOptionChanged);
 	DB.addHandler("options.TPCH", "onUpdate", onOptionChanged);
@@ -803,10 +803,10 @@ function updateHealthHelper(tokenCT, nodeCT)
 		end
 	else
 		local nPercentWounded,sStatus,sColor = fGetHealthInfo(nodeCT);
-		
+
 		if sOptTH == "bar" or sOptTH == "barhover" then
 			local w, h = tokenCT.getSize();
-		
+
 			if h >= TOKEN_HEALTH_MINBAR then
 				local widgetHealthBar = aWidgets["healthbar"];
 				if not widgetHealthBar then
@@ -821,7 +821,7 @@ function updateHealthHelper(tokenCT, nodeCT)
 				end
 			end
 			updateHealthBarScale(tokenCT, nPercentWounded);
-			
+
 			if aWidgets["healthdot"] then
 				aWidgets["healthdot"].destroy();
 			end
@@ -852,7 +852,7 @@ function updateHealthBarScale(tokenCT, nPercentWounded)
 
 		widgetHealthBar.setSize();
 		local barw, barh = widgetHealthBar.getSize();
-		
+
 		-- Resize bar to match health percentage, but preserve bulb portion of bar graphic
 		if h >= TOKEN_HEALTH_MINBAR then
 			barh = (math.max(1.0 - nPercentWounded, 0) * (math.min(h, barh) - TOKEN_HEALTH_MINBAR)) + TOKEN_HEALTH_MINBAR;
@@ -860,7 +860,7 @@ function updateHealthBarScale(tokenCT, nPercentWounded)
 			barh = TOKEN_HEALTH_MINBAR;
 		end
 
-		--[[ original 
+		--[[ original
 		widgetHealthBar.setSize(barw, barh, "bottom");
 		widgetHealthBar.setPosition("bottomright", -4, -(barh / 2) + 4);
 		--]]
@@ -869,19 +869,19 @@ function updateHealthBarScale(tokenCT, nPercentWounded)
 		Debug.chat('updateHealthBarScale run');
 		barw = barw + 20;
 		widgetHealthBar.setSize(barw, barh, "bottom");
-		widgetHealthBar.setPosition("bottomright", -20, -(barh / 2) + 4);		
+		widgetHealthBar.setPosition("bottomright", -20, -(barh / 2) + 4);
 	end
 end
 
 --
 -- Common token manager add-on effect functionality
 --
--- Callback assumed input of: 
+-- Callback assumed input of:
 --		* nodeCT
 --		* bSkipGMOnlyEffects
--- Callback assumed output of: 
+-- Callback assumed output of:
 --		* integer-based array of tables with following format
--- 			{ 
+-- 			{
 --				sName = "<Effect name to display>", (Currently, as effect icon tooltips when each displayed)
 --				sIcon = "<Effect icon asset to display on token>",
 --				sEffect = "<Original effect string>" (Currently used for large tooltips (multiple effects))
@@ -909,9 +909,9 @@ function addDefaultEffectFeatures(f)
 	CombatManager.addCombatantEffectFieldChangeHandler("label", "onAdd", updateEffectsField);
 	CombatManager.addCombatantEffectFieldChangeHandler("label", "onUpdate", updateEffectsField);
 
-	OptionsManager.registerOption2("TNPCE", false, "option_header_token", "option_label_TNPCE", "option_entry_cycler", 
+	OptionsManager.registerOption2("TNPCE", false, "option_header_token", "option_label_TNPCE", "option_entry_cycler",
 			{ labels = "option_val_tooltip|option_val_icons|option_val_iconshover|option_val_mark|option_val_markhover", values = "tooltip|on|hover|mark|markhover", baselabel = "option_val_off", baseval = "off", default = "on" });
-	OptionsManager.registerOption2("TPCE", false, "option_header_token", "option_label_TPCE", "option_entry_cycler", 
+	OptionsManager.registerOption2("TPCE", false, "option_header_token", "option_label_TPCE", "option_entry_cycler",
 			{ labels = "option_val_tooltip|option_val_icons|option_val_iconshover|option_val_mark|option_val_markhover", values = "tooltip|on|hover|mark|markhover", baselabel = "option_val_off", baseval = "off", default = "on" });
 	DB.addHandler("options.TNPCE", "onUpdate", onOptionChanged);
 	DB.addHandler("options.TPCE", "onUpdate", onOptionChanged);
@@ -935,20 +935,20 @@ function updateEffectsHelper(tokenCT, nodeCT)
 	end
 
 	local aWidgets = getWidgetList(tokenCT, "effect");
-	
+
 	if sOptTE == "off" or sOptTE == "tooltip" then
 		for _, vWidget in pairs(aWidgets) do
 			vWidget.destroy();
 		end
 	elseif sOptTE == "mark" or sOptTE == "markhover" then
 		local bWidgetsVisible = (sOptTE == "mark");
-		
+
 		local aTooltip = {};
 		local aCondList = fGetEffectInfo(nodeCT);
 		for _,v in ipairs(aCondList) do
 			table.insert(aTooltip, v.sEffect);
 		end
-		
+
 		if #aTooltip > 0 then
 			local w = aWidgets["effect1"];
 			if not w then
@@ -977,17 +977,17 @@ function updateEffectsHelper(tokenCT, nodeCT)
 		end
 	else
 		local bWidgetsVisible = (sOptTE == "on");
-		
+
 		local aCondList = fGetEffectInfo(nodeCT);
 		local nConds = #aCondList;
-		
+
 		local wToken, hToken = tokenCT.getSize();
 		local nMaxToken = math.floor(((wToken - TOKEN_EFFECT_OFFSETMAXX - TOKEN_EFFECT_MARGIN) / (TOKEN_EFFECT_WIDTH + TOKEN_EFFECT_MARGIN)) + 0.5);
 		if nMaxToken < 1 then
 			nMaxToken = 1;
 		end
 		local nMaxShown = math.min(nMaxToken, TOKEN_MAX_EFFECTS);
-		
+
 		local i = 1;
 		local nMaxLoop = math.min(nConds, nMaxShown);
 		while i <= nMaxLoop do

@@ -243,7 +243,8 @@ function onIDChanged()
 end
 
 function onHealthChanged()
-	local sColor, nPercentWounded, sStatus = ActorManager2.getWoundColor("ct", getDatabaseNode());
+	local sColor = ActorHealthManager.getHealthColor(getDatabaseNode());
+	local nPercentWounded, sStatus = ActorManager5E.getWoundPercent(getDatabaseNode());
 	-- Update the entry frame
 	updateDisplay();
 
@@ -281,7 +282,7 @@ end
 
 function activeHighlight(active)
 	--Debug.console('NAME: ' .. self.getDatabaseNode().getChild('name').getValue()  .. ' ACTIVE: ' .. tostring(active));
-	if User.isHost() then
+	if Session.isHost then
 		local nodeCT = self.getDatabaseNode();
 		if active and nodeCT then
 			local tokenCT = CombatManager.getTokenFromCT(nodeCT);

@@ -67,7 +67,7 @@ end
 ]]--
 
 function updateFromHost(OOBMsg)
-	if not User.isHost() then
+	if not Session.isHost then
 		local nodeCT = DB.findNode(OOBMsg.dbref);
 
 		Debug.console('UPDATING TOKEN REFERENCE: Got force update from host');
@@ -265,7 +265,7 @@ function updateAttributesHelper(tokenCT, nodeCT)
 	if (HeightManager) then
 		HeightManager.setupToken(tokenCT);
 	end
-	if (MapTokenManager and User.isHost()) then
+	if (MapTokenManager and Session.isHost) then
 		local sClass, sRef = DB.getValue(nodeCT,'link');
 		if sClass == 'npc' then
 			MapTokenManager.setupCombatTokenMenu(tokenCT);
@@ -278,7 +278,7 @@ function updateAttributesHelper(tokenCT, nodeCT)
 	end
 	--Debug.console("---updateAttributeHelper");
 	-- Force the client to update if the host updated
-	if User.isHost() then
+	if Session.isHost then
 		-- if we're updating attributes, then the token is on the map
 		DB.setValue(nodeCT, "tokenonmap", "number", 1);
 		sendForceUpdateOOB(nodeCT);
@@ -354,7 +354,7 @@ function updateHealthHelper(tokenCT, nodeCT)
 			vWidget.destroy();
 		end
 	else
-		local sColor, nPercentWounded, sStatus = ActorManager2.getWoundBarColor("ct", nodeCT);
+		local nPercentWounded, sStatus, sColor = ActorHealthManager.getTokenHealthInfo(nodeCT);
 		if sOptTH == "bar" or sOptTH == "barhover" then
 			local w, h = tokenCT.getSize();
 
@@ -684,7 +684,7 @@ function updateStatusOverlayWidget(tokenCT,nodeCT)
 		-- if we're Dead/Dying then make a splatter too!
 		if (sStatus:match("Dying") or
 		sStatus == "Dead") and
-		User.isHost() then
+		Session.isHost then
 			createSplatter(tokenCT,nodeCT,'image');
 		end
 	elseif (sStatus == "Critical" or
@@ -1132,7 +1132,7 @@ function getConditionIconList(nodeCT, bSkipGMOnly)
 
 	for k,v in pairs(aSorted) do
 		if DB.getValue(v, "isactive", 0) == 1 then
-			if (not bSkipGMOnly and User.isHost()) or (DB.getValue(v, "isgmonly", 0) == 0) then
+			if (not bSkipGMOnly and Session.isHost) or (DB.getValue(v, "isgmonly", 0) == 0) then
 				local sLabel = DB.getValue(v, "label", "");
 
 				local sEffect = nil;

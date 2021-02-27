@@ -1,5 +1,5 @@
--- 
--- Please see the license.html file included with this distribution for 
+--
+-- Please see the license.html file included with this distribution for
 -- attribution and copyright information.
 --
 
@@ -107,7 +107,7 @@ function processPercentiles(draginfo)
 	if nMaxMatch <= 0 then
 		return aDragDieList;
 	end
-	
+
 	local nMatch = 1;
 	local aNewDieList = {};
 	for k, v in pairs(aDragDieList) do
@@ -141,11 +141,11 @@ end
 --  ACTIONS
 --
 
-function performAction(draginfo, rActor, rRoll)	
+function performAction(draginfo, rActor, rRoll)
 	if not rRoll then
 		return;
 	end
-	
+
 	performMultiAction(draginfo, rActor, rRoll.sType, { rRoll });
 end
 
@@ -153,7 +153,7 @@ function performMultiAction(draginfo, rActor, sType, rRolls)
 	if not rRolls or #rRolls < 1 then
 		return false;
 	end
-	
+
 	if draginfo then
 		encodeActionForDrag(draginfo, rActor, sType, rRolls);
 	else
@@ -167,7 +167,7 @@ function actionHotkey(draginfo)
 	if not GameSystem.actions[sDragType] then
 		return;
 	end
-	
+
 	local rSource, rRolls = decodeActionFromDrag(draginfo, false);
 	actionDirect(rSource, sDragType, rRolls);
 	return true;
@@ -178,7 +178,7 @@ function actionDrop(draginfo, rTarget)
 	if not GameSystem.actions[sDragType] then
 		return false;
 	end
-	
+
 	local rSource, rRolls = decodeActionFromDrag(draginfo, false);
 	local aTargeting = {};
 	if rTarget or ModifierStack.getTargeting() then
@@ -188,25 +188,25 @@ function actionDrop(draginfo, rTarget)
 	end
 
 	actionRoll(rSource, aTargeting, rRolls);
-		
+
 	return true;
 end
 
 function actionDropHelper(draginfo, bResolveIfNoDice)
 	local rSource, aTargets = decodeActors(draginfo);
-	
+
 	local bModStackUsed = false;
 	lockModifiers();
-	
+
 	draginfo.setSlot(1);
 	for i = 1, draginfo.getSlotCount() do
 		if applyModifiersToDragSlot(draginfo, i, rSource, bResolveIfNoDice) then
 			bModStackUsed = true;
 		end
 	end
-	
+
 	unlockModifiers(bModStackUsed);
-	
+
 	return rSource, aTargets;
 end
 
@@ -218,13 +218,13 @@ function actionDirect(rActor, sDragType, rRolls, aTargeting)
 			aTargeting = { { } };
 		end
 	end
-	
+
 	actionRoll(rActor, aTargeting, rRolls);
 end
 
 function getTargeting(rSource, rTarget, sDragType, rRolls)
 	local aTargeting = {};
-	
+
 	if rTarget then
 		table.insert(aTargeting, { rTarget });
 	elseif GameSystem.actions[sDragType] and GameSystem.actions[sDragType].sTargeting then
@@ -244,7 +244,7 @@ function getTargeting(rSource, rTarget, sDragType, rRolls)
 			end
 		end
 	end
-	
+
 	local fTarget = aTargetingHandlers[sDragType];
 	if fTarget then
 		aTargeting = fTarget(rSource, aTargeting, rRolls);
@@ -255,7 +255,7 @@ function getTargeting(rSource, rTarget, sDragType, rRolls)
 	if #aTargeting == 0 then
 		table.insert(aTargeting, {});
 	end
-	
+
 	return aTargeting;
 end
 
@@ -266,7 +266,7 @@ function encodeActors(draginfo, rSource, aTargets)
 	else
 		draginfo.addShortcut();
 	end
-	
+
 	if aTargets then
 		for _,v in ipairs(aTargets) do
 			local sActorType, sActorNode = ActorManager.getTypeAndNodeName(v);
@@ -278,7 +278,7 @@ end
 function decodeActors(draginfo)
 	local rSource = nil;
 	local aTargets = {};
-	
+
 	for k,v in ipairs(draginfo.getShortcutList()) do
 		if k == 1 then
 			rSource = ActorManager.getActor(v.class, v.recordname);
@@ -289,7 +289,7 @@ function decodeActors(draginfo)
 			end
 		end
 	end
-	
+
 	return rSource, aTargets;
 end
 
@@ -316,9 +316,9 @@ end
 
 function encodeActionForDrag(draginfo, rSource, sType, rRolls)
 	encodeActors(draginfo, rSource);
-	
+
 	draginfo.setType(sType);
-	
+
 	if GameSystem.actions[sType] and GameSystem.actions[sType].sIcon then
 		draginfo.setIcon(GameSystem.actions[sType].sIcon);
 	elseif sType ~= "dice" then
@@ -327,11 +327,11 @@ function encodeActionForDrag(draginfo, rSource, sType, rRolls)
 	if #rRolls == 1 then
 		draginfo.setDescription(rRolls[1].sDesc);
 	end
-	
+
 	for kRoll, vRoll in ipairs(rRolls) do
 		encodeRollForDrag(draginfo, kRoll, vRoll);
 	end
-	
+
 	if #rRolls > 0 then
 		draginfo.setSecret(rRolls[1].bSecret or false);
 	end
@@ -339,20 +339,20 @@ end
 
 function decodeRollFromDrag(draginfo, i, bFinal)
 	draginfo.setSlot(i);
-	
+
 	local vRoll = draginfo.getMetaDataList();
-	
+
 	vRoll.sType = draginfo.getSlotType();
 	if vRoll.sType == "" then
 		vRoll.sType = draginfo.getType();
 	end
-	
+
 	vRoll.sDesc = draginfo.getStringData();
 	if bFinal and vRoll.sDesc == "" then
 		vRoll.sDesc = draginfo.getDescription();
 	end
 	vRoll.nMod = draginfo.getNumberData();
-	
+
 	vRoll.aDice = {};
 	if bFinal then
 		if Interface.getVersion() < 4 then
@@ -372,7 +372,7 @@ function decodeRollFromDrag(draginfo, i, bFinal)
 			end
 		end
 	end
-	
+
 	vRoll.bSecret = draginfo.getSecret();
 	return vRoll;
 end
@@ -384,7 +384,7 @@ function decodeActionFromDrag(draginfo, bFinal)
 	for i = 1, draginfo.getSlotCount() do
 		table.insert(rRolls, decodeRollFromDrag(draginfo, i, bFinal));
 	end
-	
+
 	return rSource, rRolls, aTargets;
 end
 
@@ -395,7 +395,7 @@ end
 function actionRoll(rSource, vTarget, rRolls)
 	local bModStackUsed = false;
 	lockModifiers();
-	
+
 	for _,vTargetGroup in ipairs(vTarget) do
 		for _,vRoll in ipairs(rRolls) do
 			if applyModifiersAndRoll(rSource, vTargetGroup, true, vRoll) then
@@ -403,7 +403,7 @@ function actionRoll(rSource, vTarget, rRolls)
 			end
 		end
 	end
-	
+
 	unlockModifiers(bModStackUsed);
 end
 
@@ -421,9 +421,9 @@ function applyModifiersAndRoll(rSource, vTarget, bMultiTarget, rRoll)
 	else
 		bModStackUsed = applyModifiers(rSource, vTarget, rNewRoll);
 	end
-	
+
 	roll(rSource, vTarget, rNewRoll, bMultiTarget);
-	
+
 	return bModStackUsed;
 end
 
@@ -432,7 +432,7 @@ function applyModifiersToDragSlot(draginfo, i, rSource, bResolveIfNoDice)
 
 	local nDice = #(rRoll.aDice);
 	local bModStackUsed = applyModifiers(rSource, nil, rRoll);
-	
+
 	if bResolveIfNoDice and #(rRoll.aDice) == 0 then
 		resolveAction(rSource, nil, rRoll);
 	else
@@ -456,7 +456,7 @@ function applyModifiersToDragSlot(draginfo, i, rSource, bResolveIfNoDice)
 			end
 		end
 	end
-	
+
 	return bModStackUsed;
 end
 
@@ -470,7 +470,7 @@ function unlockModifiers(bReset)
 	EffectManager.unlock();
 end
 
-function applyModifiers(rSource, rTarget, rRoll, bSkipModStack)	
+function applyModifiers(rSource, rTarget, rRoll, bSkipModStack)
 	local bAddModStack = (#(rRoll.aDice) > 0);
 	if bSkipModStack then
 		bAddModStack = false;
@@ -486,7 +486,7 @@ function applyModifiers(rSource, rTarget, rRoll, bSkipModStack)
 	if bAddModStack then
 		local bDescNotEmpty = (rRoll.sDesc ~= "");
 		local sStackDesc, nStackMod = ModifierStack.getStack(bDescNotEmpty);
-		
+
 		if sStackDesc ~= "" then
 			if bDescNotEmpty then
 				rRoll.sDesc = rRoll.sDesc .. " [" .. sStackDesc .. "]";
@@ -496,7 +496,7 @@ function applyModifiers(rSource, rTarget, rRoll, bSkipModStack)
 		end
 		rRoll.nMod = rRoll.nMod + nStackMod;
 	end
-	
+
 	return bAddModStack;
 end
 
@@ -506,11 +506,11 @@ end
 
 function buildThrow(rSource, vTargets, rRoll, bMultiTarget)
 	local rThrow = {};
-	
+
 	rThrow.type = rRoll.sType;
 	rThrow.description = rRoll.sDesc;
 	rThrow.secret = rRoll.bSecret;
-	
+
 	rThrow.shortcuts = {};
 	if rSource then
 		local sActorType, sActorNode = ActorManager.getTypeAndNodeName(rSource);
@@ -529,13 +529,13 @@ function buildThrow(rSource, vTargets, rRoll, bMultiTarget)
 			table.insert(rThrow.shortcuts, { class = sActorType, recordname = sActorNode });
 		end
 	end
-	
+
 	local rSlot = {};
 	rSlot.number = rRoll.nMod;
 	rSlot.dice = rRoll.aDice;
 	rSlot.metadata = rRoll;
 	rThrow.slots = { rSlot };
-	
+
 	return rThrow;
 end
 
@@ -555,19 +555,19 @@ function roll(rSource, vTargets, rRoll, bMultiTarget)
 			handleResolution(rRoll, rSource, { vTargets });
 		end
 	end
-end 
+end
 
 function onDiceLanded(draginfo)
 	local sDragType = draginfo.getType();
 	if GameSystem.actions[sDragType] then
 		local rSource, rRolls, aTargets = decodeActionFromDrag(draginfo, true);
-		
+
 		for _,vRoll in ipairs(rRolls) do
 			if (#(vRoll.aDice) > 0) or ((vRoll.aDice.expr or "") ~= "") then
 				handleResolution(vRoll, rSource, aTargets);
 			end
 		end
-		
+
 		return true;
 	end
 end
@@ -586,7 +586,7 @@ function handleResolution(vRoll, rSource, aTargets)
 	if fPostRoll then
 		fPostRoll(rSource, vRoll);
 	end
-	
+
 	if not aTargets or (#aTargets == 0) then
 		resolveAction(rSource, nil, vRoll);
 	elseif #aTargets == 1 then
@@ -606,7 +606,7 @@ function onChatDragStart(draginfo)
 	end
 end
 
--- 
+--
 --  RESOLVE ACTION
 --  (I.E. DISPLAY CHAT MESSAGE, COMPARISONS, ETC.)
 --
@@ -623,29 +623,29 @@ end
 
 function createActionMessage(rSource, rRoll)
 	local sDesc = rRoll.sDesc;
-	
+
 	-- Build the basic message to deliver
 	local rMessage = ChatManager.createBaseMessage(rSource, rRoll.sUser);
 	rMessage.type = rRoll.sType;
 	rMessage.text = rMessage.text .. sDesc;
 	rMessage.dice = rRoll.aDice;
 	rMessage.diemodifier = rRoll.nMod;
-	
+
 	-- Check to see if this roll should be secret (GM or dice tower tag)
 	if rRoll.bSecret then
 		rMessage.secret = true;
 		if rRoll.bTower then
 			rMessage.icon = "dicetower_icon";
 		end
-	elseif User.isHost() and OptionsManager.isOption("REVL", "off") then
+	elseif Session.isHost and OptionsManager.isOption("REVL", "off") then
 		rMessage.secret = true;
 	end
-	
+
 	-- Show total if option enabled
 	if OptionsManager.isOption("TOTL", "on") and rRoll.aDice and ((#(rRoll.aDice) > 0) or ((rRoll.aDice.expr or "") ~= "")) then
 		rMessage.dicedisplay = 1;
 	end
-	
+
 	return rMessage;
 end
 
@@ -656,7 +656,7 @@ function total(rRoll)
 		nTotal = nTotal + v.result;
 	end
 	nTotal = nTotal + rRoll.nMod;
-	
+
 	return nTotal;
 end
 
@@ -683,7 +683,7 @@ function messageResult(bSecret, rSource, rTarget, rMessageGM, rMessagePlayer)
 	else
 		bShowResultsToPlayer = true;
 	end
-	
+
 	if bShowResultsToPlayer then
 		local nodeCT = ActorManager.getCTNode(rTarget);
 		if nodeCT and CombatManager.isCTHidden(nodeCT) then
@@ -697,7 +697,7 @@ function messageResult(bSecret, rSource, rTarget, rMessageGM, rMessagePlayer)
 		rMessageGM.secret = true;
 		Comm.deliverChatMessage(rMessageGM, "");
 
-		if User.isHost() then
+		if Session.isHost then
 			local aUsers = User.getActiveUsers();
 			if #aUsers > 0 then
 				Comm.deliverChatMessage(rMessagePlayer, aUsers);

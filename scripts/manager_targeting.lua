@@ -9,7 +9,7 @@ end
 
 function onCTEntryDeleted(nodeEntry)
 	local sEntry = nodeEntry.getNodeName();
-	
+
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
 		for _,vTarget in pairs(DB.getChildren(nodeCT, "targets")) do
 			if DB.getValue(vTarget, "noderef", "") == sEntry then
@@ -43,7 +43,7 @@ function getFullTargets(rActor)
 			end
 		end
 	end
-	
+
 	return aTargets;
 end
 
@@ -60,7 +60,7 @@ function getActiveToken(vImage)
 			end
 		end
 	end
-	
+
 	return nil;
 end
 
@@ -69,26 +69,26 @@ function getSelectionHelper(vImage)
 	if #aSelected > 0 then
 		return aSelected;
 	end
-	
+
 	local tokenCT = getActiveToken(vImage);
 	if tokenCT then
 		return { tokenCT };
 	end
-	
+
 	return {};
 end
 
 function clearTargets(vImage)
 	local aSelected = getSelectionHelper(vImage);
-	--Debug.console("selected " .. vImage.getName() .. ' ' .. tostring(#aSelected)); 
+	--Debug.console("selected " .. vImage.getName() .. ' ' .. tostring(#aSelected));
 
 	for _,vToken in ipairs(aSelected) do
 		local nodeCT = CombatManager.getCTFromToken(vToken);
 		if nodeCT then
-			--Debug.console("clear from CT Node"); 
+			--Debug.console("clear from CT Node");
 			clearCTTargets(nodeCT, vToken);
 		else
-			--Debug.console("clear from token"); 
+			--Debug.console("clear from token");
 			vToken.clearTargets();
 		end
 	end
@@ -107,9 +107,9 @@ function setFactionTargets(vImage, bNegated)
 			vToken.clearTargets();
 			break;
 		end
-		
+
 		clearCTTargets(nodeCT, vToken);
-		
+
 		local sCTFaction = DB.getValue(nodeCT, "friendfoe", "");
 		if sCTFaction == "" then
 			break;
@@ -126,9 +126,9 @@ function setFactionTargets(vImage, bNegated)
 	if sSelectedFaction then
 		sFaction = sSelectedFaction;
 	end
-	
+
 	-- Iterate through tracker to target correct faction
-	local bHost = User.isHost();
+	local bHost = Session.isHost;
 	local sContainer = vImage.getDatabaseNode().getNodeName();
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
 		if DB.getValue(nodeCT, "tokenrefnode", "") == sContainer then
@@ -154,14 +154,14 @@ end
 function removeTarget(sSourceNode, sTargetNode)
 	local tokenSource = CombatManager.getTokenFromCT(sSourceNode);
 	local tokenTarget = CombatManager.getTokenFromCT(sTargetNode);
-	
+
 	if tokenSource and tokenTarget then
 		if tokenSource.getContainerNode() == tokenTarget.getContainerNode() then
 			tokenSource.setTarget(false, tokenTarget.getId());
 			return;
 		end
 	end
-	
+
 	local nodeSourceCT = CombatManager.getCTFromNode(sSourceNode);
 	local nodeTargetCT = CombatManager.getCTFromNode(sTargetNode);
 	if nodeSourceCT and nodeTargetCT then
@@ -172,7 +172,7 @@ end
 function handleToggleTarget(msgOOB)
 	local nodeSourceCT = DB.findNode(msgOOB.sSourceNode);
 	local nodeTargetCT = DB.findNode(msgOOB.sTargetNode);
-	
+
 	toggleCTTarget(nodeSourceCT, nodeTargetCT);
 end
 
@@ -180,7 +180,7 @@ function notifyToggleTarget(nodeSourceCT, nodeTargetCT)
 	-- Build OOB message to pass toggle request to host
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_TOGGLETARGET;
-	if User.isHost() then
+	if Session.isHost then
 		msgOOB.user = "";
 	else
 		msgOOB.user = User.getUsername();
@@ -197,7 +197,7 @@ function toggleClientCTTarget(nodeTargetCT)
 	if not nodeTargetCT then
 		return;
 	end
-	
+
 	local nodeSourceCT = CombatManager.getCurrentUserCT();
 	if not nodeSourceCT then
 		ChatManager.SystemMessage(Interface.getString("ct_error_targetingpcmissingfromct"));
@@ -211,7 +211,7 @@ function toggleCTTarget(nodeSourceCT, nodeTargetCT)
 	if not nodeSourceCT or not nodeTargetCT then
 		return;
 	end
-	
+
 	-- Determine whether CT
 	local vTargetEntry = nil;
 	local sNodeTargetCT = nodeTargetCT.getNodeName();
@@ -221,7 +221,7 @@ function toggleCTTarget(nodeSourceCT, nodeTargetCT)
 			break;
 		end
 	end
-	
+
 	if vTargetEntry then
 		removeCTTarget(nodeSourceCT, vTargetEntry);
 	else
@@ -233,11 +233,11 @@ function addCTTarget(nodeSourceCT, nodeTargetCT)
 	if not nodeSourceCT or not nodeTargetCT then
 		return;
 	end
-	
+
 	-- Get linked tokens (if any) and targets for source CT entry
 	local tokenSource = CombatManager.getTokenFromCT(nodeSourceCT);
 	local tokenTarget = CombatManager.getTokenFromCT(nodeTargetCT);
-	
+
 	-- Check for duplicates
 	local sNodeTargetCT = nodeTargetCT.getNodeName();
 	for _,vTarget in pairs(DB.getChildren(nodeSourceCT, "targets")) do
@@ -249,7 +249,7 @@ function addCTTarget(nodeSourceCT, nodeTargetCT)
 	-- Create new target entry
 	local vNew = DB.createChild(nodeSourceCT, "targets").createChild();
 	DB.setValue(vNew, "noderef", "string", sNodeTargetCT);
-	
+
 	-- If source linked token is actually targeting target linked token, then remove targeting on map
 	if tokenSource and tokenTarget and (tokenSource.getContainerNode().getNodeName() == tokenTarget.getContainerNode().getNodeName()) then
 		tokenSource.setTarget(true, tokenTarget);
@@ -260,10 +260,10 @@ function removeCTTarget(nodeSourceCT, nodeSourceCTTarget)
 	-- Get linked tokens (if any)
 	local tokenSource = CombatManager.getTokenFromCT(nodeSourceCT);
 	local tokenTarget = CombatManager.getTokenFromCT(DB.getValue(nodeSourceCTTarget, "noderef", ""));
-	
+
 	-- Delete CT target record
 	nodeSourceCTTarget.delete();
-	
+
 	-- If source linked token is actually targeting target linked token, then remove targeting on map
 	if tokenSource and tokenTarget and (tokenSource.getContainerNode().getNodeName() == tokenTarget.getContainerNode().getNodeName()) then
 		tokenSource.setTarget(false, tokenTarget);
@@ -274,10 +274,10 @@ function removeCTTargetEntry(nodeSourceCT, nodeSourceCTTarget)
 	-- Get linked tokens (if any)
 	local tokenSource = CombatManager.getTokenFromCT(nodeSourceCT);
 	local tokenTarget = CombatManager.getTokenFromCT(DB.getValue(nodeSourceCTTarget, "noderef", ""));
-	
+
 	-- Delete CT target record
 	nodeSourceCTTarget.delete();
-	
+
 	-- If source linked token is actually targeting target linked token, then remove targeting on map
 	if tokenSource and tokenTarget and (tokenSource.getContainerNode().getNodeName() == tokenTarget.getContainerNode().getNodeName()) then
 		tokenSource.setTarget(false, tokenTarget);
@@ -288,9 +288,9 @@ function removeCTTargeted(nodeTarget)
 	if not nodeTarget then
 		return;
 	end
-	
+
 	local sTargetCT = nodeTarget.getNodeName();
-	
+
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
 		for _,vTarget in pairs(DB.getChildren(nodeCT, "targets")) do
 			if DB.getValue(vTarget, "noderef", "") == sTargetCT then
@@ -305,22 +305,22 @@ function clearCTTargets(nodeSourceCT, tokenCT)
 	lockTargetUpdate();
 
 	-- Delete CT target records
-	--Debug.console('num targets: ' .. DB.getChildCount(nodeSourceCT, "targets")); 
+	--Debug.console('num targets: ' .. DB.getChildCount(nodeSourceCT, "targets"));
 	for _,vTarget in pairs(DB.getChildren(nodeSourceCT, "targets")) do
-		--Debug.console('targeting read only?: ' .. tostring(vTarget.isReadOnly())); 
+		--Debug.console('targeting read only?: ' .. tostring(vTarget.isReadOnly()));
 
 		local rc = vTarget.delete();
 
 	end
-	--Debug.console('num targets after: ' .. DB.getChildCount(nodeSourceCT, "targets")); 
-	
+	--Debug.console('num targets after: ' .. DB.getChildCount(nodeSourceCT, "targets"));
+
 	-- If linked token, then clear targets on map
 	if not tokenCT then
-		--Debug.console('tokenCT is NOT here'); 
+		--Debug.console('tokenCT is NOT here');
 		tokenCT = CombatManager.getTokenFromCT(nodeSourceCT);
 	end
 	if tokenCT then
-		--Debug.console('tokenCT is here'); 
+		--Debug.console('tokenCT is here');
 		tokenCT.clearTargets();
 	end
 
@@ -333,7 +333,7 @@ function setCTFactionTargets(nodeSourceCT, bNegated)
 
 	-- Lock updates from token objects to reduce overhead
 	lockTargetUpdate();
-	
+
 	-- Get the faction and targets for this CT entry
 	local sFaction = DB.getValue(nodeSourceCT, "friendfoe", "");
 
@@ -343,7 +343,7 @@ function setCTFactionTargets(nodeSourceCT, bNegated)
 	if tokenSource then
 		sContainer = tokenSource.getContainerNode().getNodeName();
 	end
-	
+
 	-- Check each actor in combat tracker for faction match
 	local nodeTargets = DB.createChild(nodeSourceCT, "targets");
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
@@ -362,13 +362,13 @@ function setCTFactionTargets(nodeSourceCT, bNegated)
 		if bAdd then
 			local vNew = nodeTargets.createChild();
 			DB.setValue(vNew, "noderef", "string", nodeCT.getNodeName());
-			
+
 			if (sContainer ~= "") and (DB.getValue(nodeCT, "tokenrefnode", "") == sContainer) then
 				tokenSource.setTarget(true, DB.getValue(nodeCT, "tokenrefid", 0));
 			end
 		end
 	end
-	
+
 	-- Restore updates from token objects
 	unlockTargetUpdate();
 end
@@ -377,10 +377,10 @@ function updateTargetsFromCT(nodeSourceCT, newTokenInstance)
 	if not nodeSourceCT or not newTokenInstance then
 		return;
 	end
-	
+
 	-- Lock updates from token objects to reduce overhead
 	lockTargetUpdate();
-	
+
 	-- Look up all tokens in CT
 	local aTokens = {};
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
@@ -389,7 +389,7 @@ function updateTargetsFromCT(nodeSourceCT, newTokenInstance)
 			aTokens[nodeCT.getNodeName()] = tokenCT;
 		end
 	end
-	
+
 	-- Check if any CT targets for the new token are on the same map, and set the target lines
 	local sContainer = newTokenInstance.getContainerNode().getNodeName();
 	for _,vTarget in pairs(DB.getChildren(nodeSourceCT, "targets")) do
@@ -398,7 +398,7 @@ function updateTargetsFromCT(nodeSourceCT, newTokenInstance)
 			newTokenInstance.setTarget(true, tokenCT);
 		end
 	end
-	
+
 	-- Check if the new token should be targeted by any tokens on the map already
 	local sNodeSourceCT = nodeSourceCT.getNodeName();
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
@@ -411,7 +411,7 @@ function updateTargetsFromCT(nodeSourceCT, newTokenInstance)
 			end
 		end
 	end
-	
+
 	-- Restore updates from token objects
 	unlockTargetUpdate();
 end
@@ -427,18 +427,18 @@ function onTargetUpdate(tokenMap)
 	if bTargetUpdateLock then
 		return;
 	end
-	
+
 	local nodeCT = CombatManager.getCTFromToken(tokenMap);
 	if not nodeCT then
 		return;
 	end
-	
+
 	local nodeTargets = DB.createChild(nodeCT, "targets");
 
 	local sTokenContainer = tokenMap.getContainerNode().getNodeName();
 	local nTokenID = tokenMap.getId();
 	local aTargets = tokenMap.getTargets();
-	
+
 	-- Figure out which targets in the CT are on the same map
 	local aCTMapTargets = {};
 	for _,vTarget in pairs(nodeTargets.getChildren()) do
@@ -450,14 +450,14 @@ function onTargetUpdate(tokenMap)
 			end
 		end
 	end
-	
+
 	-- Remove CT targets which are not part of current token target set
 	for k,v in pairs(aCTMapTargets) do
 		if not StringManager.contains(aTargets, k) then
 			v.delete();
 		end
 	end
-	
+
 	-- Add CT targets for any token targets not already accounted for
 	for _,v in ipairs(aTargets) do
 		if not aCTMapTargets[v] then
@@ -472,39 +472,39 @@ end
 
 
 function addHolders(tokenCT,nodeCT)
-	local heightNode,charSheets,owner,iden,cl,cn; 
+	local heightNode,charSheets,owner,iden,cl,cn;
 
 	if nodeCT then
-		heightNode = nodeCT.createChild("height","number"); 
-		if heightNode and User.isHost() then
+		heightNode = nodeCT.createChild("height","number");
+		if heightNode and Session.isHost then
 			-- get datasource, try to find the charsheet
 			-- if there's a charsheet, then get the list of users
 			-- find all identities own by each user, if an identity owned by a user
 			-- is equal to the name field on the nodeCT, then make that user a holder
-			--Debug.console("CT node: " .. nodeCT.getPath()); 
+			--Debug.console("CT node: " .. nodeCT.getPath());
 			if nodeCT.getChild('link').getValue() == 'charsheet'then
-				iden = nodeCT.getChild('name').getValue(); 
-				--Debug.console("name of identity: " .. iden); 
-				
+				iden = nodeCT.getChild('name').getValue();
+				--Debug.console("name of identity: " .. iden);
+
 				-- try iterating through char sheets
 				charSheets = DB.findNode('charsheet');
 				if charSheets then
 					cl = charSheets.getChildren();
 					for k,v in pairs(cl) do
-						cn = v.getChild('name'); 
+						cn = v.getChild('name');
 						if cn then
 							cn = cn.getValue();
-							--Debug.console("cn is >> " .. cn); 
+							--Debug.console("cn is >> " .. cn);
 							if cn == iden then
-								--Debug.console("we have a match, time to look for an owner"); 
-								owner = v.getOwner(); 
-								--Debug.console("Owner is: " .. owner); 
-								break; 
+								--Debug.console("we have a match, time to look for an owner");
+								owner = v.getOwner();
+								--Debug.console("Owner is: " .. owner);
+								break;
 							end
 						end
 					end
 					if owner then
-						heightNode.addHolder(owner,true); 
+						heightNode.addHolder(owner,true);
 					end
 				end
 			end

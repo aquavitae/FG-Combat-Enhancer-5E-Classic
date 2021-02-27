@@ -26,7 +26,7 @@ end
 function handleApplySave(msgOOB)
 	local rSource = ActorManager.getActor(msgOOB.sSourceType, msgOOB.sSourceNode);
 	local rOrigin = ActorManager.getActor(msgOOB.sTargetType, msgOOB.sTargetNode);
-	
+
 	local rAction = {};
 	rAction.bSecret = (tonumber(msgOOB.nSecret) == 1);
 	rAction.sDesc = msgOOB.sDesc;
@@ -35,14 +35,14 @@ function handleApplySave(msgOOB)
 	rAction.nTarget = tonumber(msgOOB.nTarget) or 0;
 	rAction.sResult = msgOOB.sResult;
 	rAction.bRemoveOnMiss = (tonumber(msgOOB.nRemoveOnMiss) == 1);
-	
+
 	applySave(rSource, rOrigin, rAction);
 end
 
 function notifyApplySave(rSource, rRoll)
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_APPLYSAVE;
-	
+
 	if rRoll.bTower then
 		msgOOB.nSecret = 1;
 	else
@@ -72,7 +72,7 @@ end
 
 function performPartySheetRoll(draginfo, rActor, sSave)
 	local rRoll = getRoll(rActor, sSave);
-	
+
 	local nTargetDC = DB.getValue("partysheet.savedc", 0);
 	if nTargetDC == 0 then
 		nTargetDC = nil;
@@ -88,7 +88,7 @@ end
 
 function performVsRoll(draginfo, rActor, sSave, nTargetDC, bSecretRoll, rSource, bRemoveOnMiss, sSaveDesc)
 	local rRoll = getRoll(rActor, sSave);
-	
+
 	if bSecretRoll then
 		rRoll.bSecret = true;
 	end
@@ -108,8 +108,8 @@ end
 
 function performRoll(draginfo, rActor, sSave)
 	local rRoll = getRoll(rActor, sSave);
-	
-	if User.isHost() and CombatManager.isCTHidden(ActorManager.getCTNode(rActor)) then
+
+	if Session.isHost and CombatManager.isCTHidden(ActorManager.getCTNode(rActor)) then
 		rRoll.bSecret = true;
 	end
 
@@ -120,9 +120,9 @@ function getRoll(rActor, sSave)
 	local rRoll = {};
 	rRoll.sType = "save";
 	rRoll.aDice = { "d20" };
-	local nMod, bADV, bDIS, sAddText = ActorManager2.getSave(rActor, sSave);
+	local nMod, bADV, bDIS, sAddText = ActorManager5E.getSave(rActor, sSave);
 	rRoll.nMod = nMod;
-	
+
 	rRoll.sDesc = "[SAVE] " .. StringManager.capitalize(sSave);
 	if sAddText and sAddText ~= "" then
 		rRoll.sDesc = rRoll.sDesc .. " " .. sAddText;
@@ -133,7 +133,7 @@ function getRoll(rActor, sSave)
 	if bDIS then
 		rRoll.sDesc = rRoll.sDesc .. " [DIS]";
 	end
-	
+
 	return rRoll;
 end
 
@@ -168,7 +168,7 @@ function modSave(rSource, rTarget, rRoll)
 	local aAddDesc = {};
 	local aAddDice = {};
 	local nAddMod = 0;
-	
+
 	local nCover = 0;
 	if sSave == "dexterity" then
 		if rRoll.sSaveDesc then
@@ -181,7 +181,7 @@ function modSave(rSource, rTarget, rRoll)
 			end
 		end
 	end
-	
+
 	if rSource then
 		local bEffects = false;
 
@@ -200,7 +200,7 @@ function modSave(rSource, rTarget, rRoll)
 		if nEffectCount > 0 then
 			bEffects = true;
 		end
-		
+
 		-- Get condition modifiers
 		if EffectManager5E.hasEffect(rSource, "ADVSAV", rTarget) then
 			bADV = true;
@@ -259,7 +259,7 @@ function modSave(rSource, rTarget, rRoll)
 				bDIS = true;
 			end
 		end
-		if sSave == "dexterity" and EffectManager5E.hasEffectCondition(rSource, "Dodge") and 
+		if sSave == "dexterity" and EffectManager5E.hasEffectCondition(rSource, "Dodge") and
 				not (EffectManager5E.hasEffectCondition(rSource, "Paralyzed") or
 				EffectManager5E.hasEffectCondition(rSource, "Stunned") or
 				EffectManager5E.hasEffectCondition(rSource, "Unconscious") or
@@ -299,13 +299,13 @@ function modSave(rSource, rTarget, rRoll)
 			sTemp = sSave;
 		end
 		if sSave then
-			local nBonusStat, nBonusEffects = ActorManager2.getAbilityEffectsBonus(rSource, sSave);
+			local nBonusStat, nBonusEffects = ActorManager5E.getAbilityEffectsBonus(rSource, sSave);
 			if nBonusEffects > 0 then
 				bEffects = true;
 				nAddMod = nAddMod + nBonusStat;
 			end
 		end
-		
+
 		-- Get exhaustion modifiers
 		local nExhaustMod, nExhaustCount = EffectManager5E.getEffectsBonus(rSource, {"EXHAUSTION"}, true);
 		if nExhaustCount > 0 then
@@ -314,7 +314,7 @@ function modSave(rSource, rTarget, rRoll)
 				bDIS = true;
 			end
 		end
-		
+
 		-- If effects apply, then add note
 		if bEffects then
 			for _, vDie in ipairs(aAddDice) do
@@ -325,7 +325,7 @@ function modSave(rSource, rTarget, rRoll)
 				end
 			end
 			rRoll.nMod = rRoll.nMod + nAddMod;
-			
+
 			local sEffects = "";
 			local sMod = StringManager.convertDiceToString(aAddDice, nAddMod, true);
 			if sMod ~= "" then
@@ -342,15 +342,15 @@ function modSave(rSource, rTarget, rRoll)
 			rRoll.sDesc = rRoll.sDesc .. " [" .. CharManager.FEAT_WAR_CASTER:upper() .. "]";
 		end
 	end
-	
+
 	if nCover > 0 then
 		rRoll.nMod = rRoll.nMod + nCover;
 		rRoll.sDesc = rRoll.sDesc .. string.format(" [COVER +%d]", nCover);
 	end
-	
+
 	ActionsManager2.encodeDesktopMods(rRoll);
 	ActionsManager2.encodeAdvantage(rRoll, bADV, bDIS);
-	
+
 	if bAutoFail then
 		rRoll.sDesc = rRoll.sDesc .. " [AUTOFAIL]";
 	end
@@ -371,7 +371,7 @@ end
 function applySave(rSource, rOrigin, rAction, sUser)
 	local msgShort = {font = "msgfont"};
 	local msgLong = {font = "msgfont"};
-	
+
 	msgShort.text = "Save";
 	msgLong.text = "Save [" .. rAction.nTotal ..  "]";
 	if rAction.nTarget > 0 then
@@ -388,9 +388,9 @@ function applySave(rSource, rOrigin, rAction, sUser)
 		msgShort.text = msgShort.text .. " [vs " .. ActorManager.getDisplayName(rOrigin) .. "]";
 		msgLong.text = msgLong.text .. " [vs " .. ActorManager.getDisplayName(rOrigin) .. "]";
 	end
-	
+
 	msgShort.icon = "roll_cast";
-		
+
 	local sAttack = "";
 	local bHalfMatch = false;
 	if rAction.sSaveDesc then
@@ -398,12 +398,12 @@ function applySave(rSource, rOrigin, rAction, sUser)
 		bHalfMatch = (rAction.sSaveDesc:match("%[HALF ON SAVE%]") ~= nil);
 	end
 	rAction.sResult = "";
-	
+
 	if rAction.nTarget > 0 then
 		if rAction.nTotal >= rAction.nTarget then
 			msgLong.text = msgLong.text .. " [SUCCESS]";
-			TokenManager2.setSaveOverlay(DB.findNode(rSource.sCTNode), 1); 
-			
+			TokenManager2.setSaveOverlay(DB.findNode(rSource.sCTNode), 1);
+
 			if rSource then
 				local bHalfDamage = bHalfMatch;
 				local bAvoidDamage = false;
@@ -422,7 +422,7 @@ function applySave(rSource, rOrigin, rAction, sUser)
 						end
 					end
 				end
-				
+
 				if bAvoidDamage then
 					rAction.sResult = "none";
 					rAction.bRemoveOnMiss = false;
@@ -430,14 +430,14 @@ function applySave(rSource, rOrigin, rAction, sUser)
 					rAction.sResult = "half_success";
 					rAction.bRemoveOnMiss = false;
 				end
-				
+
 				if rOrigin and rAction.bRemoveOnMiss then
 					TargetingManager.removeTarget(ActorManager.getCTNodeName(rOrigin), ActorManager.getCTNodeName(rSource));
 				end
 			end
 		else
 			msgLong.text = msgLong.text .. " [FAILURE]";
-			TokenManager2.setSaveOverlay(DB.findNode(rSource.sCTNode), 2); 
+			TokenManager2.setSaveOverlay(DB.findNode(rSource.sCTNode), 2);
 
 			if rSource then
 				local bHalfDamage = false;
@@ -456,16 +456,16 @@ function applySave(rSource, rOrigin, rAction, sUser)
 						end
 					end
 				end
-				
+
 				if bHalfDamage then
 					rAction.sResult = "half_failure";
 				end
 			end
 		end
 	end
-	
+
 	ActionsManager.outputResult(rAction.bSecret, rSource, rOrigin, msgLong, msgShort);
-	
+
 	if rSource and rOrigin then
 		ActionDamage.setDamageState(rOrigin, rSource, StringManager.trim(sAttack), rAction.sResult);
 	end
@@ -479,9 +479,9 @@ function performSystemShockRoll(draginfo, rActor)
 	local rRoll = { };
 	rRoll.sType = "systemshock";
 	rRoll.aDice = { "d20" };
-	local nMod, bADV, bDIS, sAddText = ActorManager2.getSave(rActor, "constitution");
+	local nMod, bADV, bDIS, sAddText = ActorManager5E.getSave(rActor, "constitution");
 	rRoll.nMod = nMod;
-	
+
 	rRoll.sDesc = "[SYSTEM SHOCK]";
 	if sAddText and sAddText ~= "" then
 		rRoll.sDesc = rRoll.sDesc .. " " .. sAddText;
@@ -492,9 +492,9 @@ function performSystemShockRoll(draginfo, rActor)
 	if bDIS then
 		rRoll.sDesc = rRoll.sDesc .. " [DIS]";
 	end
-	
+
 	rRoll.bSecret = (ActorManager.getFaction(rActor) ~= "friend");
-	
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
@@ -510,7 +510,7 @@ end
 function notifyApplySystemShock(rSource, bSecret, rRoll)
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_APPLYSS;
-	
+
 	if bSecret then
 		msgOOB.nSecret = 1;
 	else
@@ -529,19 +529,19 @@ end
 
 function handleApplySystemShock(msgOOB)
 	local rSource = ActorManager.getActor(msgOOB.sSourceType, msgOOB.sSourceNode);
-	
+
 	local rAction = {};
 	rAction.bSecret = (tonumber(msgOOB.nSecret) == 1);
 	rAction.sDesc = msgOOB.sDesc;
 	rAction.nTotal = tonumber(msgOOB.nTotal) or 0;
-	
+
 	applySystemShockRoll(rSource, rAction);
 end
 
 function applySystemShockRoll(rSource, rAction)
 	local msgShort = {font = "msgfont"};
 	local msgLong = {font = "msgfont"};
-	
+
 	msgShort.text = "System Shock";
 	msgLong.text = "System Shock [" .. rAction.nTotal ..  "]";
 	msgShort.text = msgShort.text .. " ->";
@@ -550,9 +550,9 @@ function applySystemShockRoll(rSource, rAction)
 		msgShort.text = msgShort.text .. " [for " .. ActorManager.getDisplayName(rSource) .. "]";
 		msgLong.text = msgLong.text .. " [for " .. ActorManager.getDisplayName(rSource) .. "]";
 	end
-	
+
 	msgShort.icon = "roll_cast";
-		
+
 	local bAutoFail = rAction.sDesc:match("%[AUTOFAIL%]");
 	local bSuccess = (not bAutoFail and (rAction.nTotal >= 15));
 	if bSuccess then
@@ -560,9 +560,9 @@ function applySystemShockRoll(rSource, rAction)
 	else
 		msgLong.text = msgLong.text .. " [FAILURE]";
 	end
-	
+
 	ActionsManager.outputResult(rAction.bSecret, rSource, nil, msgLong, msgShort);
-	
+
 	-- On failed system shock check, roll for system shock
 	if not bSuccess then
 		local rRoll = { sType = "systemshockresult", aDice = { "d10" }, nMod = 0 };
@@ -578,7 +578,7 @@ function onSystemShockResultRoll(rSource, rTarget, rRoll)
 	local sActorType, nodeActor = ActorManager.getTypeAndNode(rSource);
 	local nodeCT = ActorManager.getCTNode(rSource)
 	local nTotal = ActionsManager.total(rRoll);
-	
+
 	if (nTotal <= 1) then
 		if sActorType == "pc" then
 			DB.setValue(nodeActor, "hp.wounds", "number", DB.getValue(nodeActor, "hp.total", 0));
@@ -590,7 +590,7 @@ function onSystemShockResultRoll(rSource, rTarget, rRoll)
 		end
 		EffectManager.removeEffect(nodeCT, "Stable");
 		rMessage.text = rMessage.text .. " -> [DROPPED TO ZERO]";
-		
+
 	elseif ((nTotal == 2) or (nTotal == 3)) then
 		if sActorType == "pc" then
 			DB.setValue(nodeActor, "hp.wounds", "number", DB.getValue(nodeActor, "hp.total", 0));
@@ -608,7 +608,7 @@ function onSystemShockResultRoll(rSource, rTarget, rRoll)
 			EffectManager.addEffect("", "", nodeCT, aEffect, true);
 		end
 		rMessage.text = rMessage.text .. " -> [DROPPED TO ZERO, BUT STABLE]";
-		
+
 	elseif ((nTotal == 4) or (nTotal == 5)) then
 		local aEffect = { sName = "System shock; Stunned", nDuration = 1 };
 		if ActorManager.getFaction(rSource) ~= "friend" then
@@ -616,7 +616,7 @@ function onSystemShockResultRoll(rSource, rTarget, rRoll)
 		end
 		EffectManager.addEffect("", "", nodeCT, aEffect, true);
 		rMessage.text = rMessage.text .. " -> [STUNNED]";
-		
+
 	elseif ((nTotal == 6) or (nTotal == 7)) then
 		local aEffect = { sName = "System shock; NOTE: No reactions; DISATK; DISCHK", nDuration = 1 };
 		if ActorManager.getFaction(rSource) ~= "friend" then
@@ -624,7 +624,7 @@ function onSystemShockResultRoll(rSource, rTarget, rRoll)
 		end
 		EffectManager.addEffect("", "", nodeCT, aEffect, true);
 		rMessage.text = rMessage.text .. " -> [NO REACTIONS, AND DISADVANTAGE]";
-		
+
 	else -- if (nTotal >= 8) then
 		local aEffect = { sName = "System shock; NOTE: No reactions", nDuration = 1 };
 		if ActorManager.getFaction(rSource) ~= "friend" then
@@ -633,7 +633,7 @@ function onSystemShockResultRoll(rSource, rTarget, rRoll)
 		EffectManager.addEffect("", "", nodeCT, aEffect, true);
 		rMessage.text = rMessage.text .. " -> [NO REACTIONS]";
 	end
-	
+
 	Comm.deliverChatMessage(rMessage);
 end
 
@@ -646,9 +646,9 @@ function performDeathRoll(draginfo, rActor)
 	rRoll.sType = "death";
 	rRoll.aDice = { "d20" };
 	rRoll.nMod = 0;
-	
+
 	rRoll.sDesc = "[DEATH]";
-	
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
@@ -657,19 +657,19 @@ function onDeathRoll(rSource, rTarget, rRoll)
 
 	local rMessage = ActionsManager.createActionMessage(rSource, rRoll);
 
-	if ActorManager2.getPercentWounded(rSource) >= 1 then
+	if ActorManager5E.getPercentWounded(rSource) >= 1 then
 		local nTotal = ActionsManager.total(rRoll);
-		
+
 		local bStatusCheck = true;
-		local _,sOriginalStatus = ActorManager2.getPercentWounded(rSource);
-		
+		local _,sOriginalStatus = ActorManager5E.getPercentWounded(rSource);
+
 		local nFirstDie = 0;
 		if #(rRoll.aDice) > 0 then
 			nFirstDie = rRoll.aDice[1].result or 0;
 		end
 		if nFirstDie == 1 then
 			rMessage.text = rMessage.text .. " [CRITICAL FAILURE]";
-			
+
 			local sSourceType, sSourceNode = ActorManager.getTypeAndNodeName(rSource);
 			local nodeSource = nil;
 			if sSourceType == "pc" or sSourceType == "ct" then
@@ -684,7 +684,7 @@ function onDeathRoll(rSource, rTarget, rRoll)
 			end
 		elseif nFirstDie == 20 then
 			rMessage.text = rMessage.text .. " [CRITICAL SUCCESS]";
-			
+
 			ActionDamage.applyDamage(nil, rSource, rRoll.bSecret, "[HEAL]", 1);
 			bStatusCheck = false;
 		elseif nTotal >= 10 then
@@ -724,7 +724,7 @@ function onDeathRoll(rSource, rTarget, rRoll)
 				end
 			end
 		end
-		
+
 		if bStatusCheck then
 			local bShowStatus = false;
 			if ActorManager.getFaction(rSource) == "friend" then
@@ -733,14 +733,14 @@ function onDeathRoll(rSource, rTarget, rRoll)
 				bShowStatus = not OptionsManager.isOption("SHNPC", "off");
 			end
 			if bShowStatus then
-				local _,sNewStatus = ActorManager2.getPercentWounded(rSource);
+				local _,sNewStatus = ActorManager5E.getPercentWounded(rSource);
 				if sOriginalStatus ~= sNewStatus then
 					rMessage.text = rMessage.text .. " [" .. Interface.getString("combat_tag_status") .. ": " .. sNewStatus .. "]";
 				end
 			end
 		end
 	end
-	
+
 	Comm.deliverChatMessage(rMessage);
 end
 
@@ -754,7 +754,7 @@ end
 
 function getConcentrationEffects(rSource)
 	local aEffects = {};
-	
+
 	local nodeCTSource = ActorManager.getCTNode(rSource);
 	if nodeCTSource then
 		local sCTNodeSource = nodeCTSource.getPath();
@@ -776,26 +776,26 @@ function getConcentrationEffects(rSource)
 			end
 		end
 	end
-	
+
 	return aEffects;
 end
 
 function handleApplyConc(msgOOB)
 	local rSource = ActorManager.getActor(msgOOB.sSourceType, msgOOB.sSourceNode);
-	
+
 	local rAction = {};
 	rAction.bSecret = (tonumber(msgOOB.nSecret) == 1);
 	rAction.sDesc = msgOOB.sDesc;
 	rAction.nTotal = tonumber(msgOOB.nTotal) or 0;
 	rAction.nTarget = tonumber(msgOOB.nTarget) or 0;
-	
+
 	applyConcentrationRoll(rSource, rAction);
 end
 
 function notifyApplyConc(rSource, bSecret, rRoll)
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_APPLYCONC;
-	
+
 	if bSecret then
 		msgOOB.nSecret = 1;
 	else
@@ -816,9 +816,9 @@ function performConcentrationRoll(draginfo, rActor, nTargetDC)
 	local rRoll = { };
 	rRoll.sType = "concentration";
 	rRoll.aDice = { "d20" };
-	local nMod, bADV, bDIS, sAddText = ActorManager2.getSave(rActor, "constitution");
+	local nMod, bADV, bDIS, sAddText = ActorManager5E.getSave(rActor, "constitution");
 	rRoll.nMod = nMod;
-	
+
 	rRoll.sDesc = "[CONCENTRATION]";
 	if sAddText and sAddText ~= "" then
 		rRoll.sDesc = rRoll.sDesc .. " " .. sAddText;
@@ -831,7 +831,7 @@ function performConcentrationRoll(draginfo, rActor, nTargetDC)
 	end
 
 	rRoll.nTarget = nTargetDC;
-	
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
@@ -850,7 +850,7 @@ end
 function applyConcentrationRoll(rSource, rAction)
 	local msgShort = {font = "msgfont"};
 	local msgLong = {font = "msgfont"};
-	
+
 	msgShort.text = "Concentration";
 	msgLong.text = "Concentration [" .. rAction.nTotal ..  "]";
 	if rAction.nTarget > 0 then
@@ -862,17 +862,17 @@ function applyConcentrationRoll(rSource, rAction)
 		msgShort.text = msgShort.text .. " [for " .. ActorManager.getDisplayName(rSource) .. "]";
 		msgLong.text = msgLong.text .. " [for " .. ActorManager.getDisplayName(rSource) .. "]";
 	end
-	
+
 	msgShort.icon = "roll_cast";
-		
+
 	if rAction.nTotal >= rAction.nTarget then
 		msgLong.text = msgLong.text .. " [SUCCESS]";
 	else
 		msgLong.text = msgLong.text .. " [FAILURE]";
 	end
-	
+
 	ActionsManager.outputResult(rAction.bSecret, rSource, nil, msgLong, msgShort);
-	
+
 	-- On failed concentration check, remove all effects with the same source creature
 	if rAction.nTotal < rAction.nTarget then
 		expireConcentrationEffects(rSource);

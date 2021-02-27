@@ -4,22 +4,22 @@
 	Handles a majority of the map token functions (ideally)
 ]]--
 
-local MAP_NPC_TOKEN_LIST = 'map_npc_list'; 
+local MAP_NPC_TOKEN_LIST = 'map_npc_list';
 
-function onInit()	
-	--Debug.console('MAP TOKEN MANAGER LOADED'); 		
-	local npcTokenElem = nil; 
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+function onInit()
+	--Debug.console('MAP TOKEN MANAGER LOADED');
+	local npcTokenElem = nil;
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 	if not npcTokenList then
-		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST); 
+		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST);
 	end
 
 	if npcTokenList then
 		tMapIds = npcTokenList.getChildren();
 		for k,v in pairs(tMapIds) do
-			--Debug.console('INIT MAP TOKEN CLEAN:' .. k .. ' NUM CHILD: ' .. v.getChildCount()); 
+			--Debug.console('INIT MAP TOKEN CLEAN:' .. k .. ' NUM CHILD: ' .. v.getChildCount());
 			if v.getChildCount() == 0 then
-				v.delete(); 
+				v.delete();
 			end
 		end
 	end
@@ -29,11 +29,11 @@ end
 	Add our additional token actions
 ]]--
 function addAdditionalTokenMenus(token)
-	token.registerMenuItem('Visibility','lockvisibilityon',8); 
-	token.registerMenuItem('Always invisible','lockvisibilityoff',8,1); 
-	token.registerMenuItem('Always visible','lockvisibilityon',8,8); 
-	token.registerMenuItem('Mask sensitive','maskvisibility',8,7); 
-	token.onMenuSelection = onExtendedTokenSelection; 
+	token.registerMenuItem('Visibility','lockvisibilityon',8);
+	token.registerMenuItem('Always invisible','lockvisibilityoff',8,1);
+	token.registerMenuItem('Always visible','lockvisibilityon',8,8);
+	token.registerMenuItem('Mask sensitive','maskvisibility',8,7);
+	token.onMenuSelection = onExtendedTokenSelection;
 end
 
 --[[
@@ -41,86 +41,86 @@ end
 	into the NpcMenuSelection
 ]]--
 function onExtendedTokenSelection(target, ...)
-	local topSelection = arg[1];	
-	local selectedTokens = TokenHelper.getControlImageByToken(target).getSelectedTokens(); 		
+	local topSelection = arg[1];
+	local selectedTokens = TokenHelper.getControlImageByToken(target).getSelectedTokens();
 
-	--Debug.console('EXTENDED SELECTION'); 
+	--Debug.console('EXTENDED SELECTION');
 
 	if topSelection == 8 then
 		local secondSelection = arg[2];
-		local nodeCT; 
+		local nodeCT;
 		if secondSelection then
 			if secondSelection == 1 then
 				-- always invis
-				--Debug.console('always invisible!'); 
+				--Debug.console('always invisible!');
 				if #selectedTokens > 0 then
 					for _,selToken in pairs(selectedTokens) do
-						selToken.setVisible(false); 
-						setCTVisibility(selToken,0); 
+						selToken.setVisible(false);
+						setCTVisibility(selToken,0);
 					end
 				else
-					target.setVisible(false); 
-					setCTVisibility(target,0); 
+					target.setVisible(false);
+					setCTVisibility(target,0);
 				end
 			elseif secondSelection == 8 then
 				-- always vis
-				--Debug.console('always visible!'); 
+				--Debug.console('always visible!');
 				if #selectedTokens > 0 then
 					for _,selToken in pairs(selectedTokens) do
-						selToken.setVisible(true); 
-						setCTVisibility(selToken,1); 
+						selToken.setVisible(true);
+						setCTVisibility(selToken,1);
 					end
 				else
-					target.setVisible(true); 
-					setCTVisibility(target,1); 
+					target.setVisible(true);
+					setCTVisibility(target,1);
 				end
 			elseif secondSelection == 7 then
 				-- mask sensitive
-				--Debug.console('mask sensitive!'); 
+				--Debug.console('mask sensitive!');
 				if #selectedTokens > 0 then
 					for _,selToken in pairs(selectedTokens) do
-						selToken.setVisible(nil); 
-						setCTVisibility(selToken,1); 
+						selToken.setVisible(nil);
+						setCTVisibility(selToken,1);
 					end
 				else
-					target.setVisible(nil); 
-					setCTVisibility(target,1); 
+					target.setVisible(nil);
+					setCTVisibility(target,1);
 				end
 			end
 		end
 	elseif topSelection == 7 or topSelection == 3 then
-		--Debug.console('EXTENDED SELECTION 7-3'); 
+		--Debug.console('EXTENDED SELECTION 7-3');
 		-- check if we need to chain in
 		-- chain handler into npcTokenList, note we may be double-validating
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('EXTENDED SELECTION NPC TOKEN LIST'); 
-			local sMapKey = getMapTokenIndex(target); 
+			--Debug.console('EXTENDED SELECTION NPC TOKEN LIST');
+			local sMapKey = getMapTokenIndex(target);
 			local nodeMapKey = npcTokenList.getChild(sMapKey);
 			if nodeMapKey ~= nil then
-				local nodeTokenKey = nodeMapKey.getChild('tokenid' .. target.getId()); 
+				local nodeTokenKey = nodeMapKey.getChild('tokenid' .. target.getId());
 				if nodeTokenKey ~= nil then
 					-- if the elem exist in the npcTokenList, then chain into the handler
-					--Debug.console('MAP TOKEN TRIGGER: ' .. tostring(nodeMapKey) .. ' ++ ' .. tostring(nodeTokenKey) .. ' ++ ' .. nodeTokenKey.getName()); 
-					onNpcMenuSelection(target,topSelection); 
+					--Debug.console('MAP TOKEN TRIGGER: ' .. tostring(nodeMapKey) .. ' ++ ' .. tostring(nodeTokenKey) .. ' ++ ' .. nodeTokenKey.getName());
+					onNpcMenuSelection(target,topSelection);
 				else
 					-- else if the token exists on the CT, chain into the CTMenu handler
-					local nodeCT = CombatManager.getCTFromToken(target); 
+					local nodeCT = CombatManager.getCTFromToken(target);
 					if nodeCT then
-						--Debug.console('CT TOKEN TRIGGER'); 
-						onCTMenuSelection(target,topSelection); 
+						--Debug.console('CT TOKEN TRIGGER');
+						onCTMenuSelection(target,topSelection);
 					else
-						--Debug.console('NON CT or MAP TOKEN TRIGGER'); 
+						--Debug.console('NON CT or MAP TOKEN TRIGGER');
 					end
 				end
 			else
 				-- else if the token exists on the CT, chain into the CTMenu handler
-				local nodeCT = CombatManager.getCTFromToken(target); 
+				local nodeCT = CombatManager.getCTFromToken(target);
 				if nodeCT then
-					--Debug.console('CT TOKEN TRIGGER'); 
-					onCTMenuSelection(target,topSelection); 
+					--Debug.console('CT TOKEN TRIGGER');
+					onCTMenuSelection(target,topSelection);
 				else
-					--Debug.console('NON CT or MAP TOKEN TRIGGER'); 
+					--Debug.console('NON CT or MAP TOKEN TRIGGER');
 				end
 			end
 		end
@@ -131,13 +131,13 @@ end
 	Set CTVisibility
 ]]--
 function setCTVisibility(token,visible)
-	local nodeCT = CombatManager.getCTFromToken(token); 
+	local nodeCT = CombatManager.getCTFromToken(token);
 	if nodeCT then
 		local tokenvis = nodeCT.createChild('tokenvis','number');
 		if visible == 0 then
-			tokenvis.setValue(0); 
+			tokenvis.setValue(0);
 		elseif visible == 1 then
-			tokenvis.setValue(1); 
+			tokenvis.setValue(1);
 		end
 	end
 end
@@ -148,12 +148,12 @@ end
 function prepMapToken(x,y,mapTokenNode,imgCtl)
 	-- create a token on the image control we may need to add a widget to indicate it's not on the tracker
 	-- create an reference list if it does not exist within the image control
-	-- create an entry in this list with the tokenID, set the value to the npc reference's node-Name; 
+	-- create an entry in this list with the tokenID, set the value to the npc reference's node-Name;
 	-- NOTE when we check this later, we need to confirm that this node name exists before we add to the tracker
 	-- NOTE OR we can hook into the onDelete to remove these references as a form of garbage collection
-	--Debug.console('attempting to prep the map token'); 
-	local sName = DB.getValue(mapTokenNode,'name'); 
-	
+	--Debug.console('attempting to prep the map token');
+	local sName = DB.getValue(mapTokenNode,'name');
+
 	local tokenProto = DB.getValue(mapTokenNode, "token", "");
 	if tokenProto == "" or not Interface.isToken(tokenProto) then
 		local sLetter = StringManager.trim(sName):match("^([a-zA-Z])");
@@ -167,38 +167,38 @@ function prepMapToken(x,y,mapTokenNode,imgCtl)
 
 
 	-- Add it to the image at the drop coordinates using the npc's space from CM
-	local space, reach = CombatManager.getNPCSpaceReach(mapTokenNode); 
+	local space, reach = CombatManager.getNPCSpaceReach(mapTokenNode);
 	TokenManager.setDragTokenUnits(space);
-	local newMapToken = imgCtl.addToken(tokenProto,x,y); 
+	local newMapToken = imgCtl.addToken(tokenProto,x,y);
 	TokenManager.endDragTokenWithUnits();
 
-	--Debug.console('newToken: ' .. tostring(newMapToken) .. ' ++ proto is: ' .. tokenProto); 
+	--Debug.console('newToken: ' .. tostring(newMapToken) .. ' ++ proto is: ' .. tokenProto);
 	if newMapToken == nil then
 		-- we failed to create a token, inform the user to put in a token image to use this feature
-		Comm.addChatMessage({text="Failed to create NPC map link, make sure you have an actual token image for that npc entry (using the default letters does not count)",secret=true}); 
+		Comm.addChatMessage({text="Failed to create NPC map link, make sure you have an actual token image for that npc entry (using the default letters does not count)",secret=true});
 	else
 		-- we have a token reference, so let's do work!
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if not npcTokenList then
-			npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST); 
+			npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST);
 		end
 		if npcTokenList then
-			--Debug.console('npc list made/found ' .. newMapToken.getId()); 
+			--Debug.console('npc list made/found ' .. newMapToken.getId());
 			-- we need an elem name that is a combination of the image name + token id
-			--local npcTokenElem = npcTokenList.createChild('npc' .. newMapToken.getId(),'string'); 
-			local npcTokenElem = getMapTokenEntry(newMapToken); 
+			--local npcTokenElem = npcTokenList.createChild('npc' .. newMapToken.getId(),'string');
+			local npcTokenElem = getMapTokenEntry(newMapToken);
 			if npcTokenElem then
-				--Debug.console('npc element made'); 
-				npcTokenElem.setValue(mapTokenNode.getNodeName()); 
-				setupMapTokenMenu(newMapToken); 
+				--Debug.console('npc element made');
+				npcTokenElem.setValue(mapTokenNode.getNodeName());
+				setupMapTokenMenu(newMapToken);
 				-- add an underlay to denote that this is a 'map' token and not on the CT yet
-				newMapToken.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2); 
+				newMapToken.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2);
 				-- add double click handler to open the NPC entry
-				newMapToken.onDoubleClick = onMapTokenDoubleClick; 
+				newMapToken.onDoubleClick = onMapTokenDoubleClick;
 				-- initial state is invisible
-				newMapToken.setVisible(false); 
+				newMapToken.setVisible(false);
 				-- flag them as unmodifiable
-				newMapToken.setModifiable(false); 
+				newMapToken.setModifiable(false);
 			end
 		end
 
@@ -207,20 +207,20 @@ end
 
 -- return the maptoken index used for this imagecontrol
 function getMapTokenIndex(token,imgCtl)
-	local imgCtlNode; 
-	if not imgCtl then 		
-		imgCtlNode = TokenHelper.getControlImageByToken(token).getDatabaseNode(); 
+	local imgCtlNode;
+	if not imgCtl then
+		imgCtlNode = TokenHelper.getControlImageByToken(token).getDatabaseNode();
 	else
-		imgCtlNode = imgCtl.getDatabaseNode(); 
+		imgCtlNode = imgCtl.getDatabaseNode();
 	end
 
-	local imgNode = imgCtlNode.getParent(); 
-	local simgName = imgNode.getChild('name').getValue(); 
+	local imgNode = imgCtlNode.getParent();
+	local simgName = imgNode.getChild('name').getValue();
 
-	simgName = simgName .. imgNode.getName() .. imgCtlNode.getName(); 
-	simgName = sanatizeXML(simgName); 
+	simgName = simgName .. imgNode.getName() .. imgCtlNode.getName();
+	simgName = sanatizeXML(simgName);
 
-	return simgName; 
+	return simgName;
 end
 
 --[[
@@ -232,41 +232,41 @@ end
 	 return the reference if successful, else nil
 ]]--
 function getMapTokenEntry(token,imgCtl)
-	local npcTokenElem = nil; 
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+	local npcTokenElem = nil;
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 	if not npcTokenList then
-		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST); 
+		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST);
 	end
 
 	if npcTokenList then
-		local sImageKey = getMapTokenIndex(token,imgCtl); 
-		--Debug.console('GET--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId()); 
-		local nodeImgKey = npcTokenList.createChild(sImageKey); 
-		npcTokenElem = nodeImgKey.createChild('tokenid'..token.getId(),"string"); 
+		local sImageKey = getMapTokenIndex(token,imgCtl);
+		--Debug.console('GET--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId());
+		local nodeImgKey = npcTokenList.createChild(sImageKey);
+		npcTokenElem = nodeImgKey.createChild('tokenid'..token.getId(),"string");
 	end
 
-	return npcTokenElem; 
+	return npcTokenElem;
 end
 
 --[[
 	Check for the existance of the token in the map token list
 ]]--
 function checkMapTokenEntry(token,imgCtl)
-	local npcTokenElem = nil; 
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+	local npcTokenElem = nil;
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 	if not npcTokenList then
-		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST); 
-		return false; 
+		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST);
+		return false;
 	end
 
 	if npcTokenList then
-		local sImageKey = getMapTokenIndex(token,imgCtl); 
-		local nodeImgKey = npcTokenList.getChild(sImageKey); 
+		local sImageKey = getMapTokenIndex(token,imgCtl);
+		local nodeImgKey = npcTokenList.getChild(sImageKey);
 		if nodeImgKey then
-			npcTokenElem = nodeImgKey.getChild('tokenid'..token.getId()); 
-			--Debug.console('CHECK--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId() .. ' ++ ' .. tostring(npcTokenElem)); 
+			npcTokenElem = nodeImgKey.getChild('tokenid'..token.getId());
+			--Debug.console('CHECK--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId() .. ' ++ ' .. tostring(npcTokenElem));
 			if npcTokenElem and npcTokenElem.getValue() ~= ''  then
-				return true; 
+				return true;
 			end
 		end
 	end
@@ -274,13 +274,13 @@ end
 
 -- return the maptoken index used for this imagecontrol
 function getMapTokenIndexInit(imgCtl)
-	local imgCtlNode = imgCtl.getDatabaseNode(); 
-	local imgNode = imgCtlNode.getParent(); 
-	local simgName = imgNode.getChild('name').getValue(); 
-	simgName = simgName .. imgNode.getName() .. imgCtlNode.getName(); 
-	simgName = sanatizeXML(simgName); 
+	local imgCtlNode = imgCtl.getDatabaseNode();
+	local imgNode = imgCtlNode.getParent();
+	local simgName = imgNode.getChild('name').getValue();
+	simgName = simgName .. imgNode.getName() .. imgCtlNode.getName();
+	simgName = sanatizeXML(simgName);
 
-	return simgName; 
+	return simgName;
 end
 
 --[[
@@ -292,41 +292,41 @@ end
 	 return the reference if successful, else nil
 ]]--
 function getMapTokenEntryInit(token,imgCtl)
-	local npcTokenElem = nil; 
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+	local npcTokenElem = nil;
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 	if not npcTokenList then
-		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST); 
+		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST);
 	end
 
 	if npcTokenList then
-		local sImageKey = getMapTokenIndexInit(imgCtl); 
-		--Debug.console('GET--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId()); 
-		local nodeImgKey = npcTokenList.createChild(sImageKey); 
-		npcTokenElem = nodeImgKey.createChild('tokenid'..token.getId(),"string"); 
+		local sImageKey = getMapTokenIndexInit(imgCtl);
+		--Debug.console('GET--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId());
+		local nodeImgKey = npcTokenList.createChild(sImageKey);
+		npcTokenElem = nodeImgKey.createChild('tokenid'..token.getId(),"string");
 	end
 
-	return npcTokenElem; 
+	return npcTokenElem;
 end
 
 --[[
 	Check for the existance of the token in the map token list
 ]]--
 function checkMapTokenEntryInit(token,imgCtl)
-	local npcTokenElem = nil; 
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+	local npcTokenElem = nil;
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 	if not npcTokenList then
-		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST); 
-		return false; 
+		npcTokenList = DB.createNode(MAP_NPC_TOKEN_LIST);
+		return false;
 	end
 
 	if npcTokenList then
-		local sImageKey = getMapTokenIndexInit(imgCtl); 
-		local nodeImgKey = npcTokenList.getChild(sImageKey); 
+		local sImageKey = getMapTokenIndexInit(imgCtl);
+		local nodeImgKey = npcTokenList.getChild(sImageKey);
 		if nodeImgKey then
-			npcTokenElem = nodeImgKey.getChild('tokenid'..token.getId()); 
-			--Debug.console('CHECK--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId() .. ' ++ ' .. tostring(npcTokenElem)); 
+			npcTokenElem = nodeImgKey.getChild('tokenid'..token.getId());
+			--Debug.console('CHECK--> imagekey: ' .. sImageKey .. ' tokenid: ' .. token.getId() .. ' ++ ' .. tostring(npcTokenElem));
 			if npcTokenElem and npcTokenElem.getValue() ~= ''  then
-				return true; 
+				return true;
 			end
 		end
 	end
@@ -335,21 +335,21 @@ end
 
 -- Light, half-butt sanitation
 function sanatizeXML(str)
-	str = str:gsub('%s',''); 
-	str = str:gsub('%.',''); 
-	str = str:gsub('%(',''); 
-	str = str:gsub('%)',''); 
-	str = str:gsub('%%',''); 
-	str = str:gsub('%-',''); 
-	str = str:gsub('%+',''); 
-	str = str:gsub('%*',''); 
-	str = str:gsub('%?',''); 
-	str = str:gsub('%[',''); 
-	str = str:gsub('%]',''); 
-	str = str:gsub('%^',''); 
-	str = str:gsub('%$',''); 
+	str = str:gsub('%s','');
+	str = str:gsub('%.','');
+	str = str:gsub('%(','');
+	str = str:gsub('%)','');
+	str = str:gsub('%%','');
+	str = str:gsub('%-','');
+	str = str:gsub('%+','');
+	str = str:gsub('%*','');
+	str = str:gsub('%?','');
+	str = str:gsub('%[','');
+	str = str:gsub('%]','');
+	str = str:gsub('%^','');
+	str = str:gsub('%$','');
 
-	return str; 
+	return str;
 end
 
 --[[
@@ -357,37 +357,37 @@ end
 	map_npc_list mappings!
 ]]--
 function initMapTokens(imgCtl)
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
-	local listTokens = imgCtl.getTokens(); 
-	local nodeCT; 
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
+	local listTokens = imgCtl.getTokens();
+	local nodeCT;
 
 	if npcTokenList then
 		-- check if we have a mapping in map_npc_list
-		--Debug.console('I- npc token list found'); 
+		--Debug.console('I- npc token list found');
 		for _,token in pairs(listTokens) do
-			nodeCT = CombatManager.getCTFromToken(token); 
+			nodeCT = CombatManager.getCTFromToken(token);
 			if not nodeCT then
 				if checkMapTokenEntry(token,imgCtl) then
-					local npcTokenElem = getMapTokenEntry(token,imgCtl); 
-					local npcDataNodeName = npcTokenElem.getValue(); 
-					local npcDataNode = DB.findNode(npcDataNodeName); 
-					--Debug.console('I- npc element : ' .. npcDataNodeName); 
+					local npcTokenElem = getMapTokenEntry(token,imgCtl);
+					local npcDataNodeName = npcTokenElem.getValue();
+					local npcDataNode = DB.findNode(npcDataNodeName);
+					--Debug.console('I- npc element : ' .. npcDataNodeName);
 					-- we're 100% sure, now bind the handlers
-					setupMapTokenMenu(token); 
+					setupMapTokenMenu(token);
 					-- add an underlay to denote that this is a 'map' token and not on the CT yet
 					-- we need to find the NPC node again to get the space
-					local space, reach = CombatManager.getNPCSpaceReach(npcDataNode); 
-					token.removeAllUnderlays(); 
-					token.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2); 
+					local space, reach = CombatManager.getNPCSpaceReach(npcDataNode);
+					token.removeAllUnderlays();
+					token.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2);
 					-- add double click handler to open the NPC entry
-					token.onDoubleClick = onMapTokenDoubleClick; 
+					token.onDoubleClick = onMapTokenDoubleClick;
 					-- flag them as unmodifiable
-					token.setModifiable(false); 
+					token.setModifiable(false);
 				end
 			else
 				local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
 				if sClass == 'npc' then
-					setupCombatTokenMenu(token); 
+					setupCombatTokenMenu(token);
 				end
 			end
 		end
@@ -396,55 +396,55 @@ end
 
 -- setup a single token that may have been reset somehow
 function initSingleToken(token)
-	local nodeCT; 
+	local nodeCT;
 
-	nodeCT = CombatManager.getCTFromToken(token); 
+	nodeCT = CombatManager.getCTFromToken(token);
 	if not nodeCT then
 		-- check if we have a mapping in map_npc_list
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('I- npc token list found'); 
+			--Debug.console('I- npc token list found');
 
 			if checkMapTokenEntry(token) then
-				local npcTokenElem = getMapTokenEntry(token); 
-				local npcDataNodeName = npcTokenElem.getValue(); 
-				local npcDataNode = DB.findNode(npcDataNodeName); 
-				--Debug.console('I- npc element : ' .. npcDataNodeName); 
+				local npcTokenElem = getMapTokenEntry(token);
+				local npcDataNodeName = npcTokenElem.getValue();
+				local npcDataNode = DB.findNode(npcDataNodeName);
+				--Debug.console('I- npc element : ' .. npcDataNodeName);
 				-- we're 100% sure, now bind the handlers
-				setupMapTokenMenu(token); 
+				setupMapTokenMenu(token);
 				-- add an underlay to denote that this is a 'map' token and not on the CT yet
 				-- we need to find the NPC node again to get the space
-				local space, reach = CombatManager.getNPCSpaceReach(npcDataNode); 
-				token.removeAllUnderlays(); 
-				token.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2); 
+				local space, reach = CombatManager.getNPCSpaceReach(npcDataNode);
+				token.removeAllUnderlays();
+				token.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2);
 				-- add double click handler to open the NPC entry
-				token.onDoubleClick = onMapTokenDoubleClick; 
+				token.onDoubleClick = onMapTokenDoubleClick;
 				-- flag them as unmodifiable
-				token.setModifiable(false); 
+				token.setModifiable(false);
 			end
 		end
 	else
 		local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
 		if sClass == 'npc' then
-			setupCombatTokenMenu(token); 
+			setupCombatTokenMenu(token);
 		end
 	end
 end
 
 --[[
-	
+
 ]]--
 function onMapTokenDoubleClick(tokenMap, vImage)
-	if Input.isShiftPressed() and User.isHost() then
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+	if Input.isShiftPressed() and Session.isHost then
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('MC- npc token list found'); 
+			--Debug.console('MC- npc token list found');
 
 			if checkMapTokenEntry(tokenMap) then
-				local npcTokenElem = getMapTokenEntry(tokenMap); 
-				local npcDataNodeName = npcTokenElem.getValue(); 
-				local npcDataNode = DB.findNode(npcDataNodeName); 
-				--Debug.console('MC- npc element : ' .. npcDataNodeName); 
+				local npcTokenElem = getMapTokenEntry(tokenMap);
+				local npcDataNodeName = npcTokenElem.getValue();
+				local npcDataNode = DB.findNode(npcDataNodeName);
+				--Debug.console('MC- npc element : ' .. npcDataNodeName);
 				if npcDataNode then
 					Interface.openWindow("npc", npcDataNode);
 					vImage.clearSelectedTokens();
@@ -452,7 +452,7 @@ function onMapTokenDoubleClick(tokenMap, vImage)
 			end
 		end
 	end
-	return true; 
+	return true;
 end
 
 --[[
@@ -460,39 +460,39 @@ end
 	4 for a group selection
 ]]--
 function setupMapTokenMenu(token)
-	token.registerMenuItem('Add to Tracker','addcombat_radial',3); 
-	token.registerMenuItem('Add Selected Tracker','addcombat_multi_radial',7); 
+	token.registerMenuItem('Add to Tracker','addcombat_radial',3);
+	token.registerMenuItem('Add Selected Tracker','addcombat_multi_radial',7);
 
 	-- we handle this in our addToken function, chaining into onNPCMenuSelection
-	--token.onMenuSelection = onNpcMenuSelection; 
-	token.onDelete = onNpcDelete; 
+	--token.onMenuSelection = onNpcMenuSelection;
+	token.onDelete = onNpcDelete;
 	-- migrated this to CombatSnap's manager_token.lua
-	--token.onDoubleClick = onNpcDoubleClick; 
+	--token.onDoubleClick = onNpcDoubleClick;
 end
 
 function setupCombatTokenMenu(token)
-	token.registerMenuItem('Remove from Tracker','delcombat_radial',3); 
-	token.registerMenuItem('Remove Selected from Tracker','delcombat_multi_radial',7); 
+	token.registerMenuItem('Remove from Tracker','delcombat_radial',3);
+	token.registerMenuItem('Remove Selected from Tracker','delcombat_multi_radial',7);
 end
 
 --[[
 	our delete handler for when npc tokens are removed
 ]]--
 function onNpcDelete(target)
-	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+	local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 	if npcTokenList then
-		--Debug.console('D- npc token list found'); 
+		--Debug.console('D- npc token list found');
 		if checkMapTokenEntry(target) then
-			local npcTokenElem = getMapTokenEntry(target); 
-			local npcDataNodeName = npcTokenElem.getValue(); 
-			--Debug.console('D- npc element : ' .. npcDataNodeName); 
-			npcTokenElem.delete(); 
+			local npcTokenElem = getMapTokenEntry(target);
+			local npcDataNodeName = npcTokenElem.getValue();
+			--Debug.console('D- npc element : ' .. npcDataNodeName);
+			npcTokenElem.delete();
 		end
 		--clean everything!
 		--[[
 		local list = npcTokenList.getChildren();
 		for k,v in pairs(list) do
-			v.delete(); 
+			v.delete();
 		end
 		]]--
 	end
@@ -503,101 +503,101 @@ end
 	our menu selection handler for map tokens
 ]]--
 function onNpcMenuSelection(target, ...)
-	local topSelection = arg[1]; 
-	local imgCtl = TokenHelper.getControlImageByToken(target); 
-	--Debug.console("selected an item! NPC " .. tostring(topSelection)); 
+	local topSelection = arg[1];
+	local imgCtl = TokenHelper.getControlImageByToken(target);
+	--Debug.console("selected an item! NPC " .. tostring(topSelection));
 	if topSelection == 3 then
-		--Debug.console("in item! " .. tostring(topSelection)); 
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		--Debug.console("in item! " .. tostring(topSelection));
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('npc token list found'); 
+			--Debug.console('npc token list found');
 
 			if checkMapTokenEntry(target) then
-				local npcTokenElem = getMapTokenEntry(target); 
-				local npcDataNodeName = npcTokenElem.getValue(); 
-				local npcDataNode = DB.findNode(npcDataNodeName); 
-				--Debug.console('npc element : ' .. npcDataNodeName); 
+				local npcTokenElem = getMapTokenEntry(target);
+				local npcDataNodeName = npcTokenElem.getValue();
+				local npcDataNode = DB.findNode(npcDataNodeName);
+				--Debug.console('npc element : ' .. npcDataNodeName);
 				if npcDataNode then
 					-- we try to insert our NPC into the combat tracker
-					local visibility = target.isVisible(); 
-					local nodeCT = CombatManager.addNPC('npc', npcDataNode); 
+					local visibility = target.isVisible();
+					local nodeCT = CombatManager.addNPC('npc', npcDataNode);
 					--local nodeCT = CombatManager2.addNPC('npc', npcDataNode, npcDataNode.getChild('name').getValue())
 					-- destroy the map_npc_list links and the menu additions
-					npcTokenElem.delete(); 
+					npcTokenElem.delete();
 					target.resetMenuItems();
 					-- re-add our visibility menus
-					addAdditionalTokenMenus(target); 
+					addAdditionalTokenMenus(target);
 					-- add combat menus MIGRATED to updateAttributeHelper
-					--setupCombatTokenMenu(target); 
-					--target.onDelete = nil; 
-					--target.onMenuSelection = nil; 
+					--setupCombatTokenMenu(target);
+					--target.onDelete = nil;
+					--target.onMenuSelection = nil;
 					-- remove our 'map token' underlay;
-					target.removeAllUnderlays(); 
+					target.removeAllUnderlays();
 					-- finish configuration that normally occurs in combat manager
 					DB.setValue(nodeCT, "token", "token", target.getPrototype());
 					-- strip the local onClickHandler that was used for unbinded map-tokens
-					target.onDoubleClick = TokenManager.onDoubleClick; 
+					target.onDoubleClick = TokenManager.onDoubleClick;
 					TokenManager.linkToken(nodeCT, target);
-					TokenManager.updateAttributes(nodeCT.getChild('tokenrefid')); 
-					local visNode = nodeCT.getChild('tokenvis'); 
+					TokenManager.updateAttributes(nodeCT.getChild('tokenrefid'));
+					local visNode = nodeCT.getChild('tokenvis');
 					if visNode then
 						if visibility then
-							visNode.setValue(1); 
+							visNode.setValue(1);
 						else
-							visNode.setValue(0); 
+							visNode.setValue(0);
 						end
 					end
 				else
-					--Debug.console('BAD DATA NODE'); 
-					Comm.addChatMessage({text="NPC linked no longer exists! Deleting token..",secret=true}); 
-					target.delete(); 
+					--Debug.console('BAD DATA NODE');
+					Comm.addChatMessage({text="NPC linked no longer exists! Deleting token..",secret=true});
+					target.delete();
 				end
 			end
 		end
 	elseif topSelection == 7 then
-		local listTokens = imgCtl.getSelectedTokens(); 
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		local listTokens = imgCtl.getSelectedTokens();
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('S- npc token list found'); 
+			--Debug.console('S- npc token list found');
 			for _,token in pairs(listTokens) do
 				-- check if we have a mapping in map_npc_list
 
 				if checkMapTokenEntry(token)  then
-					local npcTokenElem = getMapTokenEntry(token); 
-					local npcDataNodeName = npcTokenElem.getValue(); 
-					local npcDataNode = DB.findNode(npcDataNodeName); 
-					--Debug.console('S- npc element : ' .. npcDataNodeName); 
+					local npcTokenElem = getMapTokenEntry(token);
+					local npcDataNodeName = npcTokenElem.getValue();
+					local npcDataNode = DB.findNode(npcDataNodeName);
+					--Debug.console('S- npc element : ' .. npcDataNodeName);
 					-- we're 100$ sure, now add them
 					if npcDataNode then
 						-- we try to insert our NPC into the combat tracker
-						local visibility = token.isVisible(); 
+						local visibility = token.isVisible();
 						local nodeCT = CombatManager.addNPC('npc', npcDataNode)
 						--local nodeCT = CombatManager2.addNPC('npc', npcDataNode, npcDataNode.getChild('name').getValue())
 						-- destroy the map_npc_list links and the menu additions
-						npcTokenElem.delete(); 
-						token.resetMenuItems(); 		
+						npcTokenElem.delete();
+						token.resetMenuItems();
 						-- re-add our visibility menus
-						addAdditionalTokenMenus(token); 
+						addAdditionalTokenMenus(token);
 						-- add combat menus MIGRATED to updateAttributHelper
-						--setupCombatTokenMenu(token); 
+						--setupCombatTokenMenu(token);
 						-- finish configuration that normally occurs in combat manager
 						DB.setValue(nodeCT, "token", "token", token.getPrototype());
 						-- strip the local onClickHandler that was used for unbinded map-tokens
-						token.onDoubleClick = TokenManager.onDoubleClick; 
+						token.onDoubleClick = TokenManager.onDoubleClick;
 						TokenManager.linkToken(nodeCT, token);
-						TokenManager.updateAttributes(nodeCT.getChild('tokenrefid')); 
-						local visNode = nodeCT.getChild('tokenvis'); 
+						TokenManager.updateAttributes(nodeCT.getChild('tokenrefid'));
+						local visNode = nodeCT.getChild('tokenvis');
 						if visNode then
 							if visibility then
-								visNode.setValue(1); 
+								visNode.setValue(1);
 							else
-								visNode.setValue(0); 
+								visNode.setValue(0);
 							end
 						end
 					else
-						--Debug.console('BAD DATA NODE'); 
-						Comm.addChatMessage({text="NPC linked no longer exists! Deleting token..",secret=true}); 
-						token.delete(); 
+						--Debug.console('BAD DATA NODE');
+						Comm.addChatMessage({text="NPC linked no longer exists! Deleting token..",secret=true});
+						token.delete();
 					end
 				end
 			end
@@ -609,97 +609,97 @@ end
 	our menu selection handler for combat tokens
 ]]--
 function onCTMenuSelection(target, ...)
-	local topSelection = arg[1]; 
-	local imgCtl = TokenHelper.getControlImageByToken(target); 
-	--Debug.console("selected an item COMBAT!! " .. tostring(topSelection)); 
+	local topSelection = arg[1];
+	local imgCtl = TokenHelper.getControlImageByToken(target);
+	--Debug.console("selected an item COMBAT!! " .. tostring(topSelection));
 
 	if topSelection == 3 then
-		--Debug.console("in item! " .. tostring(topSelection)); 
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		--Debug.console("in item! " .. tostring(topSelection));
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('S- npc token list found'); 
+			--Debug.console('S- npc token list found');
 
-			nodeCT = CombatManager.getCTFromToken(target); 
+			nodeCT = CombatManager.getCTFromToken(target);
 			if nodeCT then
-				local x,y = target.getPosition(); 
-				--Debug.console(nodeCT.getName()); 
-				
+				local x,y = target.getPosition();
+				--Debug.console(nodeCT.getName());
+
 				-- The record is useless as it'll point right back to the CT node we're deleting
 				local sClass,sRecord = DB.getValue(nodeCT, "sourcelink", "", "");
-				--Debug.console('S- class: ' .. tostring(sClass) .. ' Record: ' .. tostring(sRecord)); 
+				--Debug.console('S- class: ' .. tostring(sClass) .. ' Record: ' .. tostring(sRecord));
 
 				-- we will only do this for npcs clearly, note that we don't check
-				-- the sourcelink's validity if it's been deleted, we handle this 
+				-- the sourcelink's validity if it's been deleted, we handle this
 				-- elsewhere when it's added to the tracker
 				if sClass == 'npc' then
-					local space, reach = CombatManager.getNPCSpaceReach(nodeCT); 
+					local space, reach = CombatManager.getNPCSpaceReach(nodeCT);
 					TokenManager.setDragTokenUnits(space);
-					local newMapToken = imgCtl.addToken(target.getPrototype(),x,y); 
+					local newMapToken = imgCtl.addToken(target.getPrototype(),x,y);
 					TokenManager.endDragTokenWithUnits();
 					if newMapToken then
-						local npcTokenElem = getMapTokenEntry(newMapToken); 
+						local npcTokenElem = getMapTokenEntry(newMapToken);
 						if npcTokenElem then
-							--Debug.console('S- npc element made'); 
-							local space = DB.getValue(nodeCT,'space',5); 
-							npcTokenElem.setValue(sRecord); 
-							setupMapTokenMenu(newMapToken); 
+							--Debug.console('S- npc element made');
+							local space = DB.getValue(nodeCT,'space',5);
+							npcTokenElem.setValue(sRecord);
+							setupMapTokenMenu(newMapToken);
 							-- add an underlay to denote that this is a 'map' token and not on the CT yet
-							newMapToken.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2); 
+							newMapToken.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2);
 							-- add double click handler to open the NPC entry
-							newMapToken.onDoubleClick = onMapTokenDoubleClick; 
+							newMapToken.onDoubleClick = onMapTokenDoubleClick;
 							-- initial state is the CT's visibility
-							newMapToken.setVisible(target.isVisible()); 
+							newMapToken.setVisible(target.isVisible());
 							-- finially remove the CT node
-							nodeCT.delete(); 
+							nodeCT.delete();
 						end
 					else
-						Comm.addChatMessage({text="Failed to create NPC map link, make sure you have an actual token image for that npc entry (using the default letters does not count)",secret=true}); 
+						Comm.addChatMessage({text="Failed to create NPC map link, make sure you have an actual token image for that npc entry (using the default letters does not count)",secret=true});
 					end
 				end
 			end
 		end
 	elseif topSelection == 7 then
-		local listTokens = imgCtl.getSelectedTokens(); 
-		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST); 
+		local listTokens = imgCtl.getSelectedTokens();
+		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
-			--Debug.console('S- npc token list found'); 
+			--Debug.console('S- npc token list found');
 			for _,token in pairs(listTokens) do
 				-- check if we have a mapping in map_npc_list
-				nodeCT = CombatManager.getCTFromToken(token); 
+				nodeCT = CombatManager.getCTFromToken(token);
 				if nodeCT then
-					local x,y = token.getPosition(); 
-					--Debug.console(nodeCT.getName()); 
-					
+					local x,y = token.getPosition();
+					--Debug.console(nodeCT.getName());
+
 					-- The record is useless as it'll point right back to the CT node we're deleting
 					local sClass,sRecord = DB.getValue(nodeCT, "sourcelink", "", "");
-					--Debug.console('S- class: ' .. tostring(sClass) .. ' Record: ' .. tostring(sRecord)); 
+					--Debug.console('S- class: ' .. tostring(sClass) .. ' Record: ' .. tostring(sRecord));
 
 					-- we will only do this for npcs clearly, note that we don't check
-					-- the sourcelink's validity if it's been deleted, we handle this 
+					-- the sourcelink's validity if it's been deleted, we handle this
 					-- elsewhere when it's added to the tracker
 					if sClass == 'npc' then
-						local space, reach = CombatManager.getNPCSpaceReach(nodeCT); 
+						local space, reach = CombatManager.getNPCSpaceReach(nodeCT);
 						TokenManager.setDragTokenUnits(space);
-						local newMapToken = imgCtl.addToken(token.getPrototype(),x,y); 
+						local newMapToken = imgCtl.addToken(token.getPrototype(),x,y);
 						TokenManager.endDragTokenWithUnits();
 						if newMapToken then
-							local npcTokenElem = getMapTokenEntry(newMapToken); 
+							local npcTokenElem = getMapTokenEntry(newMapToken);
 							if npcTokenElem then
-								--Debug.console('S- npc element made'); 
-								local space = DB.getValue(nodeCT,'space',5); 
-								npcTokenElem.setValue(sRecord); 
-								setupMapTokenMenu(newMapToken); 
+								--Debug.console('S- npc element made');
+								local space = DB.getValue(nodeCT,'space',5);
+								npcTokenElem.setValue(sRecord);
+								setupMapTokenMenu(newMapToken);
 								-- add an underlay to denote that this is a 'map' token and not on the CT yet
-								newMapToken.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2); 
+								newMapToken.addUnderlay(space/5/2, CombatEnhancer.TOKENUNDERLAYCOLOR_2);
 								-- add double click handler to open the NPC entry
-								newMapToken.onDoubleClick = onMapTokenDoubleClick; 
+								newMapToken.onDoubleClick = onMapTokenDoubleClick;
 								-- initial state is the CT's visibility
-								newMapToken.setVisible(token.isVisible()); 
+								newMapToken.setVisible(token.isVisible());
 								-- finially remove the CT node
-								nodeCT.delete(); 
+								nodeCT.delete();
 							end
 						else
-							Comm.addChatMessage({text="Failed to create NPC map link, make sure you have an actual token image for that npc entry (using the default letters does not count)",secret=true}); 
+							Comm.addChatMessage({text="Failed to create NPC map link, make sure you have an actual token image for that npc entry (using the default letters does not count)",secret=true});
 						end
 					end
 				end

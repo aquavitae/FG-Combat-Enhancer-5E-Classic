@@ -1,7 +1,7 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 function onInit()
-	if User.isHost() then
+	if Session.isHost then
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH, "isidentified"), "onUpdate", onCTEntryIDUpdate);
 		DB.addHandler(DB.getPath("npc.*", "isidentified"), "onUpdate", onNPCEntryIDUpdate);
 	end
@@ -11,7 +11,7 @@ local bProcessingCTEntryIDUpdate = false;
 function onCTEntryIDUpdate(vNode)
 	if bProcessingCTEntryIDUpdate then return; end
 	bProcessingCTEntryIDUpdate = true;
-	
+
 	local nodeCT = vNode.getParent();
 	local nIsIdentified = DB.getValue(nodeCT, "isidentified", 1);
 	local _,sCTEntrySourceRecord = DB.getValue(nodeCT, "sourcelink", "", "");
@@ -25,9 +25,9 @@ function onCTEntryIDUpdate(vNode)
 		-- set the base NPC node as well
 		local nodeNPC = DB.findNode(sCTEntrySourceRecord);
 		if nodeNPC then
-			--Debug.console('CT entry id state changed (npc manager), updating npc id state'); 
-			local nodeIdentified = nodeNPC.createChild('isidentified','number'); 
-			nodeIdentified.setValue(nIsIdentified); 
+			--Debug.console('CT entry id state changed (npc manager), updating npc id state');
+			local nodeIdentified = nodeNPC.createChild('isidentified','number');
+			nodeIdentified.setValue(nIsIdentified);
 		end
 
 	end
@@ -38,18 +38,18 @@ end
 --[[
 -- Lets do this moons way then from the NPCManager
 ]]--
-local bSemaphoreProcessingNPCEntryUpdate = false; 
+local bSemaphoreProcessingNPCEntryUpdate = false;
 function onNPCEntryIDUpdate(vNode)
-	--Debug.console("attempting to respond to npc entry id"); 
+	--Debug.console("attempting to respond to npc entry id");
 	if bSemaphoreProcessingNPCEntryUpdate or bProcessingCTEntryIDUpdate then return; end
-	bSemaphoreProcessingNPCEntryUpdate = true; 
+	bSemaphoreProcessingNPCEntryUpdate = true;
 	bProcessingCTEntryIDUpdate = true;
 
 	local nodeNPC = vNode.getParent();
-	local nodeNPCRef = nodeNPC.getPath(); 
-	local nIsIdentified = DB.getValue(nodeNPC, "isidentified", 1); 
+	local nodeNPCRef = nodeNPC.getPath();
+	local nIsIdentified = DB.getValue(nodeNPC, "isidentified", 1);
 
-	--Debug.console("attempting to up CT entries"); 
+	--Debug.console("attempting to up CT entries");
 	for _,v in pairs(CombatManager.getCombatantNodes()) do
 		local _,sRecord = DB.getValue(v, "sourcelink", "", "");
 		if sRecord == nodeNPCRef then
@@ -58,7 +58,7 @@ function onNPCEntryIDUpdate(vNode)
 	end
 
 	bProcessingCTEntryIDUpdate = false;
-	bSemaphoreProcessingNPCEntryUpdate = false; 
+	bSemaphoreProcessingNPCEntryUpdate = false;
 end
 
 function addLinkToBattle(nodeBattle, sLinkClass, sLinkRecord, nCount)
@@ -90,12 +90,12 @@ function addLinkToBattle(nodeBattle, sLinkClass, sLinkRecord, nCount)
 			DB.setValue(nodeTargetNPC, "count", "number", nCount or 1);
 			DB.setValue(nodeTargetNPC, "name", "string", sName);
 			DB.setValue(nodeTargetNPC, "link", "windowreference", sLinkClass, sLinkRecord);
-			
+
 			local nodeID = DB.getChild(sLinkRecord, "isidentified");
 			if nodeID then
 				DB.setValue(nodeTargetNPC, "isidentified", "number", nodeID.getValue());
 			end
-			
+
 			local sToken = DB.getValue(DB.getPath(sLinkRecord, "token"), "");
 			if sToken == "" or not Interface.isToken(sToken) then
 				local sLetter = StringManager.trim(sName):match("^([a-zA-Z])");
@@ -110,6 +110,6 @@ function addLinkToBattle(nodeBattle, sLinkClass, sLinkRecord, nCount)
 			return false;
 		end
 	end
-	
+
 	return true;
 end

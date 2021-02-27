@@ -6,10 +6,10 @@ local tokensPlayerLayer = nil;
 
 function onInit()
 	super.onInit()
-	
-	if not User.isHost() then
+
+	if not Session.isHost then
 		DB.addHandler(DB.getPath(getDatabaseNode(), "locked"), "onUpdate", onLockChanged);
-	end	
+	end
 
 	onStateChanged()
 
@@ -25,8 +25,8 @@ function onInit()
 
 	--imageLayerShortcuts = imageLayerDBNode.getChild("shortcuts")
 
-	if User.isHost()  then
-		-- make the toolbar visible 
+	if Session.isHost then
+		-- make the toolbar visible
 		--toggle_toolbars.setVisible(true)
 
 		-- Enable/show the top play layer when the image is first opened.
@@ -39,7 +39,7 @@ function onInit()
 		else
 			showLayer("play")
 		end
-		
+
 
 		--local x, y, zoom = play_image.getViewpoint()
 		--Debug.console("imagewindow.lua: onInit.  play_image viewpoint before syncToImageDrawingSize = " .. x .. ", " .. y .. " x " .. zoom)
@@ -107,7 +107,7 @@ function playLayerTokenMoved(movedTokenInstance)
 				break;
 			end
 		end
-		
+
 	end
 end
 
@@ -115,10 +115,10 @@ end
 function onClose()
 	ImageManager.unregisterImage(features_image)
 	ImageManager.unregisterImage(play_image)
-	
-	if not User.isHost() then
+
+	if not Session.isHost then
 		DB.removeHandler(DB.getPath(getDatabaseNode(), "locked"), "onUpdate", onLockChanged);
-	end	
+	end
 
 	super.onClose()
 end
@@ -137,27 +137,27 @@ end
 
 function syncLayerSizeToBaseImage()
 	Debug.console("syncLayerSizeToBaseImage...");
-	
+
 	-- sync play and features images to base image size which is set in super.onStageChanged
 	local nImageLeft, nImageTop, nImageRight, nImageBottom = image.getStaticBounds()
 	--Debug.console("Image bounds are: " .. nImageLeft, nImageTop, nImageRight, nImageBottom);
 	if nImageLeft then
 		features_image.setStaticBounds(nImageLeft, nImageTop, nImageRight, nImageBottom)
 		play_image.setStaticBounds(nImageLeft, nImageTop, nImageRight, nImageBottom)
-	end	
+	end
 end
 
 function onStateChanged()
 	if super and super.onStateChanged then
 		super.onStateChanged()
-	end	
-	
+	end
+
 	syncLayerSizeToBaseImage();
 
 --	if toolbar then
 --		local bShowToolbar = false
 --		local nodeRecord = getDatabaseNode()
---		if User.isHost() then
+--		if Session.isHost then
 --			bShowToolbar = not WindowManager.getReadOnlyState(nodeRecord)
 --		else
 --			local nDefault = 0
@@ -204,7 +204,7 @@ function showLayer(layername)
 		-- Remove any token shadows on the feature layer
 		LayerTokenManager.removeLayerTokens(self, "features_image")
 		-- Clear token instances for play layer as we're back on that layer
-		tokensPlayerLayer = nil;		
+		tokensPlayerLayer = nil;
 	elseif layername == "features" then
 		-- Disable and set invisible: play (top) image, Enable and set visible: features (middle) image, Disable and set visible: image (bottom) image
 		play_image.setEnabled(false)
@@ -253,7 +253,7 @@ end
 function syncToImageGrid()
 	-- Determine if base image has a grid
 	 if image.hasGrid() then
-		-- Copy base image (bottom layer) grid to features_image (middle layer) and play_image (top layer) 
+		-- Copy base image (bottom layer) grid to features_image (middle layer) and play_image (top layer)
 		features_image.setGridType(image.getGridType())
 		features_image.setGridSize(image.getGridSize())
 		features_image.setGridOffset(image.getGridOffset())
@@ -270,7 +270,7 @@ end
 
 function syncToPlayImageGrid(layercontrol)
 
-	if User.isHost() then
+	if Session.isHost then
 		-- determine if this is a new grid being added on any layer
 		if layercontrol then
 			if layercontrol.hasGrid() and not play_image.hasGrid() then
@@ -289,7 +289,7 @@ function syncToPlayImageGrid(layercontrol)
 
 				return
 			elseif layercontrol.hasGrid() then
-				-- Copy play_image (top layer) grid to features_image (middle layer) and base layer (image) 
+				-- Copy play_image (top layer) grid to features_image (middle layer) and base layer (image)
 
 				features_image.setGridType(play_image.getGridType())
 				features_image.setGridSize(play_image.getGridSize())
@@ -303,7 +303,7 @@ function syncToPlayImageGrid(layercontrol)
 		end
 
 		 if play_image.hasGrid() then
-			-- Copy play_image (top layer) grid to features_image (middle layer) and base layer (image) 
+			-- Copy play_image (top layer) grid to features_image (middle layer) and base layer (image)
 			features_image.setGridType(play_image.getGridType())
 			features_image.setGridSize(play_image.getGridSize())
 			features_image.setGridOffset(play_image.getGridOffset())
@@ -321,7 +321,7 @@ end
 function removeGrid()
 	--Debug.console("imagewindow.lua: removeGrid")
 	-- Disable the grid on all layers
-	if User.isHost() then
+	if Session.isHost then
 		play_image.setGridSize(0)
 		features_image.setGridSize(0)
 		image.setGridSize(0)
@@ -338,7 +338,7 @@ function syncToImageMask()
 		-- Enable play image (top layer) mask
 		play_image.setMaskEnabled(true)
 		-- Disable base image (bottom layer) mask
-		-- 
+		--
 		-- image.setMaskEnabled(false)
 	end
 end
@@ -391,7 +391,7 @@ function syncToPlayImageViewpoint()
 			play_image.setViewpoint(x, y, zoom)
 		end
 		synclocked = false
-	end 
+	end
 end
 
 function syncToImageDrawingSize()

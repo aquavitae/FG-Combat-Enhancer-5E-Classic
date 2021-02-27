@@ -37,7 +37,7 @@ function onInit()
 			end
 		end
 	end
-	
+
 	if self.onValueChanged then
 		self.onValueChanged();
 	end
@@ -48,7 +48,7 @@ function addButton(sID, sIcon, sTooltip)
 	if toggle then
 		bToggle = true;
 	end
-	
+
 	local button = window.createControl("toolbar_button", sID);
 	if button then
 		local x = nButtonHorzMargin + (nButtons * (nButtonSize + nButtonHorzMargin));
@@ -65,7 +65,7 @@ function addButton(sID, sIcon, sTooltip)
 		button.setAnchoredHeight(nButtonSize);
 
 		button.configure(self, sID, sIcon, sTooltip, bToggle);
-		
+
 		aButtons[sID] = button;
 
 		if isVisible() then
@@ -92,7 +92,7 @@ end
 
 function setVisibility(bVisible)
 	setVisible(bVisible);
-	
+
 	for id, button in pairs(aButtons) do
 		button.setVisible(bVisible);
 	end
