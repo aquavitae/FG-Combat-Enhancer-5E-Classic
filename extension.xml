@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <!--
-	Copyright (C) 2018 Ken L., Original Work.	
-	Copyright (C) December 2018 onwards Styrmir, code and graphics modified by Styrmir from Original Work and other sources. Changelog available in "Changelog (versions).txt" document.	
+	Copyright (C) 2018 Ken L., Original Work.
+	Copyright (C) December 2018 onwards Styrmir, code and graphics modified by Styrmir from Original Work and other sources. Changelog available in "Changelog (versions).txt" document.
 
 	Licensed under the GPL Version 3 license.
 	http://www.gnu.org/licenses/gpl.html
@@ -22,7 +22,7 @@
 	<properties>
 		<name>Combat Enhancer 5E Classic</name>
 		<version>1.6.1</version>
-		
+
 		<author>Styrmir T.</author>
 		<description>Combat Enhancer 5E Classic</description>
 
@@ -30,40 +30,30 @@
 
 		<ruleset>
 			<name>5E</name>
-			<!-- 
-			<maxrelease>8</maxrelease>
-			<minrelease>7</minrelease>
-			-->
 		</ruleset>
 
-			
 		<dependency>
 			<name>Core RPG - Token Helper</name>
-			<!--
-			<minversion>1.1.4</minversion>
-			<maxversion>2.9.9</maxversion>			
-			-->
 		</dependency>
 
-		
-	</properties>    	
+	</properties>
 
-	<base>									
+	<base>
 		<!-- Custom .lua code files for 5e Combat Enhancer -->
-		<script name="CombatEnhancer" file="scripts/5e_combat_enhancer.lua" />        <!-- Custom modifications and additions to the base extension -->		
-		<script name="ActionAttack" file="scripts/manager_action_attack.lua" />			  <!-- Imported from 5e Ruleset, modified to handle range modifiers for ranged attacks -->		
-		<script name="ActionsManager" file="scripts/manager_actions.lua" />				<!-- Imported from CoreRPG, modified to handle range modifiers for ranged attacks -->								
+		<script name="CombatEnhancer" file="scripts/5e_combat_enhancer.lua" />        <!-- Custom modifications and additions to the base extension -->
+		<script name="ActionAttack" file="scripts/manager_action_attack.lua" />			  <!-- Imported from 5e Ruleset, modified to handle range modifiers for ranged attacks -->
+		<script name="ActionsManager" file="scripts/manager_actions.lua" />				<!-- Imported from CoreRPG, modified to handle range modifiers for ranged attacks -->
 		<!-- <script name="PointerToolkit" file="scripts/pointer_toolkit.lua" /> -->     <!-- Used for drawing custom shapes on map, ping function -->
-    
-		
+
+
 		<!-- Menu items for 5e Combat Enhancer -->
 		<string name="option_header_5ecombatenhancer">5e Combat Enhancer</string>
 		<string name="option_gm_underlay">Token underlay opacity (GM only)</string>
 		<string name="option_render_blood_splatter_on_death">Render blood splatter on death</string>
 		<string name="option_draw_skull_on_death">Draw skull on death</string>
-		<string name="option_draw_blood_on_token">Draw blood on token</string>			
-		<string name="option_fade_ct_npc_on_death">Change NPC background on death in CT</string>		
-		<string name="option_fade_npc_effect_icons_on_death">Change NPC token effect icons on death</string>		
+		<string name="option_draw_blood_on_token">Draw blood on token</string>
+		<string name="option_fade_ct_npc_on_death">Change NPC background on death in CT</string>
+		<string name="option_fade_npc_effect_icons_on_death">Change NPC token effect icons on death</string>
 		<string name="option_bring_full_screen_interface_to_front">Chat and modifiers on top (full screen)</string>
 		<string name="option_blood_splatter_scaling">Blood splatter scaling</string>
 		<string name="option_token_effect_size">Token effect icon size</string>
@@ -80,7 +70,7 @@
 		<string name="spellshare">Post spell text into chat</string>
 
 		<!-- Status icons -->
-		<icon name="ec_icon" file="icon.png" />		
+		<icon name="ec_icon" file="icon.png" />
 		<!-- <script name="VersionCheck" file="scripts/manager_versionchk.lua" /> -->
         <script name="TokenManager2" file="scripts/manager_token2.lua" />
         <script name="CombatManager2" file="scripts/manager_combat2.lua" />
@@ -111,26 +101,26 @@
 
 
 		<!-- <script name="ImageRange" file="campaign/scripts/image.lua" /> --> <!-- create reference so possible to call for actor to target range update -->
-		<!-- Layers -->				
+		<!-- Layers -->
 		<template name="image_record_step">
 			<imagecontrol name="image">
 				<indicators availability="image_sent" locked="image_locked" loading="image_loading" zoom="image_zoom" shortcuts="image_shortcuts" />
 				<default snap="on" drawingsize="200,200" />
-				<script file="campaign/scripts/image.lua" />				
-			</imagecontrol>						
+				<script file="campaign/scripts/image.lua" />
+			</imagecontrol>
 		</template>
-				
-		<includefile source="graphics/graphics_layers.xml" />		
-		<includefile source="common/template_toolbar.xml" /> 
-		<includefile source="campaign/record_image.xml" /> 
+
+		<includefile source="graphics/graphics_layers.xml" />
+		<includefile source="common/template_toolbar.xml" />
+		<includefile source="campaign/record_image.xml" />
 		<!-- <includefile source="campaign/record_image_resize.xml" /> -->
-		<includefile source="campaign/record_encounter.xml" />		
+		<includefile source="campaign/record_encounter.xml" />
 
 		<script name="CombatManager" file="scripts/manager_combat.lua" />
 		<script name="TargetingManager" file="scripts/manager_targeting.lua" />
 		<script name="LayerTokenManager" file="scripts/manager_layer_tokens.lua" />
-		<script name="PingManager" file="scripts/manager_ping.lua" /> 
-		<script name="MapTokenManager" file="scripts/manager_maptoken.lua" />		
+		<script name="PingManager" file="scripts/manager_ping.lua" />
+		<script name="MapTokenManager" file="scripts/manager_maptoken.lua" />
 
 
 		<!-- Height -->
@@ -157,9 +147,9 @@
 
 
 		<!-- Images -->
-		<!-- 
+		<!--
 			Change appearance of image frames/panels.
-			Black background for images / battlemaps mask (fog of war) 
+			Black background for images / battlemaps mask (fog of war)
 		-->
 		<framedef name="imagebox">
 			<bitmap file="graphics/frames/imagebox v1.png" />
@@ -170,12 +160,12 @@
 		<framedef name="imagebox_header">
 			<bitmap file="graphics/frames/imagebox_header.png" />
 			<offset>0,0,0,0</offset>
-		</framedef>	-->	
-		<!-- v1.3.0 -->			
+		</framedef>	-->
+		<!-- v1.3.0 -->
 		<framedef name="imagepanel">
 			<bitmap file="graphics/frames/imagepanel v2.png" />
 			<offset>16,16,16,16</offset>
-		</framedef>	
+		</framedef>
 
 
 		<!--
@@ -184,7 +174,7 @@
 		</framedef>
 		<framedef name="imagepanel">
 			<bitmap file="graphics/frames/imagepanel v2.png" />
-		</framedef>		
+		</framedef>
 		<framedef name="headergray">
 			<bitmap file="graphics/frames/headergray v1.png" />
 		</framedef>	-->
@@ -192,19 +182,19 @@
 
 
 		<!-- Settings Menu items -->
-		<!-- 
+		<!--
 		<script name="5eCombatEnhancerMenuSettings">
 			function onInit()
                 OptionsManager.addOptionValue("5eCombatEnhancer", "option_val_5eCombatEnhancer_custom1", "5eCombatEnhancer_custom1", true);
 				OptionsManager.addOptionValue("5eCombatEnhancer", "option_val_5eCombatEnhancer_custom2", "5eCombatEnhancer_custom2", true);
 			end
 		</script>
-		
-		<string name="option_val_5eCombatEnhancer_custom1">Decal 1</string> 
-        <string name="option_val_5eCombatEnhancer_custom2">Decal 2</string> 
+
+		<string name="option_val_5eCombatEnhancer_custom1">Decal 1</string>
+        <string name="option_val_5eCombatEnhancer_custom2">Decal 2</string>
 
 		<icon name="5eCombatEnhancer_custom1" file="graphics/decals/1.jpg" />
-        <icon name="5eCombatEnhancer_custom2" file="graphics/decals/2.jpg" /> 
+        <icon name="5eCombatEnhancer_custom2" file="graphics/decals/2.jpg" />
 
 		<options>
 		<public />
@@ -214,8 +204,8 @@
 			<TNAM type="string">tooltip</TNAM>
 		</options>-->
 
-		
-	</base>			
 
-	<announcement text="Combat Enhancer 5E Classic v1.6.1" font="emotefont" icon="ec_icon" />			
+	</base>
+
+	<announcement text="Combat Enhancer 5E Classic v1.6.1" font="emotefont" icon="ec_icon" />
 </root>
