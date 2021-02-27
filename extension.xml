@@ -31,18 +31,18 @@
 		<ruleset>
 			<name>5E</name>
 		</ruleset>
-
-		<dependency>
-			<name>Core RPG - Token Helper</name>
-		</dependency>
-
 	</properties>
 
 	<base>
+		<!-- From Token Helper -->
+		<script name="RangedAttack" file="scripts/ranged_attacks.lua" />	<!-- Handles ranged attack modifiers -->
+		<script name="TokenHelper" file="scripts/token_helper.lua" />		<!-- Custom modifications and additions to the base extension -->
+		<script name="Flanking" file="scripts/5e_flanking.lua" />			<!-- Custom script to automatically handle flanking rules -->
+
 		<!-- Custom .lua code files for 5e Combat Enhancer -->
-		<script name="CombatEnhancer" file="scripts/5e_combat_enhancer.lua" />        <!-- Custom modifications and additions to the base extension -->
-		<script name="ActionAttack" file="scripts/manager_action_attack.lua" />			  <!-- Imported from 5e Ruleset, modified to handle range modifiers for ranged attacks -->
-		<script name="ActionsManager" file="scripts/manager_actions.lua" />				<!-- Imported from CoreRPG, modified to handle range modifiers for ranged attacks -->
+		<script name="CombatEnhancer" file="scripts/5e_combat_enhancer.lua" />		<!-- Custom modifications and additions to the base extension -->
+		<script name="ActionAttack" file="scripts/manager_action_attack.lua" />		<!-- Imported from 5e Ruleset, modified to handle range modifiers for ranged attacks -->
+		<script name="ActionsManager" file="scripts/manager_actions.lua" />			<!-- Imported from CoreRPG, modified to handle range modifiers for ranged attacks -->
 		<!-- <script name="PointerToolkit" file="scripts/pointer_toolkit.lua" /> -->     <!-- Used for drawing custom shapes on map, ping function -->
 
 
