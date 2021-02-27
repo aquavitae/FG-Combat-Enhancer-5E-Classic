@@ -71,7 +71,6 @@
 
 		<!-- Status icons -->
 		<icon name="ec_icon" file="icon.png" />
-		<!-- <script name="VersionCheck" file="scripts/manager_versionchk.lua" /> -->
         <script name="TokenManager2" file="scripts/manager_token2.lua" />
         <script name="CombatManager2" file="scripts/manager_combat2.lua" />
 		<script name="DataCommon" file="scripts/data_common.lua" />
@@ -82,7 +81,6 @@
 
 		<includefile source="graphics/graphics_icons.xml" />
 		<includefile source="graphics/graphics_radial.xml" />
-		<!-- <includefile source="utility/template_utility_override.xml" /> -->
 		<includefile source="utility/utility_effects_override.xml" />
 
 
@@ -113,7 +111,6 @@
 		<includefile source="graphics/graphics_layers.xml" />
 		<includefile source="common/template_toolbar.xml" />
 		<includefile source="campaign/record_image.xml" />
-		<!-- <includefile source="campaign/record_image_resize.xml" /> -->
 		<includefile source="campaign/record_encounter.xml" />
 
 		<script name="CombatManager" file="scripts/manager_combat.lua" />
@@ -127,24 +124,7 @@
         <script name="HeightManager" file="scripts/manager_height.lua" />
 		<includefile source="graphics/graphics_fonts.xml" />
 
-		<!-- for NPC id -->
-		<!-- Moon integrated his version of NPCID for 3.3.6 -->
-		<!--
-		<string name="option_label_NPID">NPC: Identification</string>
-		<string name="library_recordtype_empty_nonid_npc">Unidentified Creature</string>
-		<includefile source="campaign/record_npc.xml" />
-		-->
-
 		<script name="NPCManager" file="scripts/manager_npc.lua" />
-
-		<!-- Moon integrated his version of NPCID for 3.3.6 -->
-		<!--
-		<script name="LibraryData" file="scripts/data_library.lua" />
-		<script name="DataOptionsNPC" file="scripts/data_options_npcid.lua" />
-		-->
-
-
-
 
 		<!-- Images -->
 		<!--
@@ -156,54 +136,11 @@
 			<offset>150,135,150,150</offset>
 			<insideoffset>0,0,18,22</insideoffset>
 		</framedef>
-		<!--
-		<framedef name="imagebox_header">
-			<bitmap file="graphics/frames/imagebox_header.png" />
-			<offset>0,0,0,0</offset>
-		</framedef>	-->
-		<!-- v1.3.0 -->
+
 		<framedef name="imagepanel">
 			<bitmap file="graphics/frames/imagepanel v2.png" />
 			<offset>16,16,16,16</offset>
 		</framedef>
-
-
-		<!--
-		<framedef name="imagebox_header">
-			<bitmap file="graphics/frames/imagebox_header v1.png" />
-		</framedef>
-		<framedef name="imagepanel">
-			<bitmap file="graphics/frames/imagepanel v2.png" />
-		</framedef>
-		<framedef name="headergray">
-			<bitmap file="graphics/frames/headergray v1.png" />
-		</framedef>	-->
-
-
-
-		<!-- Settings Menu items -->
-		<!--
-		<script name="5eCombatEnhancerMenuSettings">
-			function onInit()
-                OptionsManager.addOptionValue("5eCombatEnhancer", "option_val_5eCombatEnhancer_custom1", "5eCombatEnhancer_custom1", true);
-				OptionsManager.addOptionValue("5eCombatEnhancer", "option_val_5eCombatEnhancer_custom2", "5eCombatEnhancer_custom2", true);
-			end
-		</script>
-
-		<string name="option_val_5eCombatEnhancer_custom1">Decal 1</string>
-        <string name="option_val_5eCombatEnhancer_custom2">Decal 2</string>
-
-		<icon name="5eCombatEnhancer_custom1" file="graphics/decals/1.jpg" />
-        <icon name="5eCombatEnhancer_custom2" file="graphics/decals/2.jpg" />
-
-		<options>
-		<public />
-			<CTAV type="string">on</CTAV>
-			<MC4C type="string">2C</MC4C>
-			<TBOX type="string">on</TBOX>
-			<TNAM type="string">tooltip</TNAM>
-		</options>-->
-
 
 	</base>
 

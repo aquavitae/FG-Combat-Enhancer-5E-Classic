@@ -25,8 +25,6 @@
 
 	<!-- Background image window panel -->
 	<windowclass name="imagepanelwindow" merge="join">
-<!--		<sharable shareas="imagewindow" />
-		<frame>imagepanel</frame>-->
 		<script file="campaign/scripts/updated_imagewindow.lua" />
 		<sheetdata>
 			<sub_record_toolbar_imagepanel name="toolbar" />
@@ -40,19 +38,8 @@
 			<imagepanel_record name="play_image" insertbefore="scroller_image">
 				<script file="campaign/scripts/image.lua" />
 			</imagepanel_record>
-<!--			<scrollercontrol name="scroller_image">
-				<anchored to="image" position="insidebottomright" offset="3,3" width="40" height="38" />
-				<target>image</target>
-				<button normal="button_scrollerpan" pressed="button_scrollerpan_down" zoom="button_zoomer" zoompressed="button_zoomer_down" />
-			</scrollercontrol>
-			<imagepaneldata_record name="imagedata" source="image" />-->
 		</sheetdata>
 	</windowclass>
-
-
-
-
-
 
 	<!-- Floating image window toolbar -->
 	<windowclass name="imagewindow_toolbar" merge="join">
@@ -185,31 +172,6 @@
 				</script>
 			</toolbar_30>
 
-			<!-- Fog of War section -->
-			<!--
-			<buttoncontrol name="toolbar_fow" insertbefore="h4">
-				<anchored to="toolbar_anchor" width="34" height="34">
-					<top />
-					<left anchor="right" relation="relative" />
-				</anchored>
-				<invisible/>
-				<state icon="tool_fow_30" />
-				<frame name="toolbar_30" />
-				<tooltip textres="tooltip_fow_toolbar" />
-				<script>
-					function onButtonPress()
-						Debug.console("pressed fow button!");
-						FOW.fow();
-					end
-
-					function updateDisplay()
-					end
-				</script>
-			</buttoncontrol>
-			-->
-
-
-
 			<!-- Layers section -->
 			<genericcontrol name="h4" insertbefore="h2">
 				<anchored to="toolbar_anchor" width="5" height="34">
@@ -218,6 +180,7 @@
 				</anchored>
 				<invisible />
 			</genericcontrol>
+
 			<!-- Toggle play and background layer button -->
 			<buttoncontrol name="toggle_layers_quick" insertbefore="h2">
 				<anchored to="toolbar_anchor" width="34" height="34">
@@ -345,13 +308,6 @@
 
 		</sheetdata>
 	</windowclass>
-
-
-
-
-
-
-
 
 	<!-- Background image window panel toolbar -->
 	<windowclass name="imagepanelwindow_toolbar_v339">
