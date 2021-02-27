@@ -637,7 +637,7 @@ function createActionMessage(rSource, rRoll)
 		if rRoll.bTower then
 			rMessage.icon = "dicetower_icon";
 		end
-	elseif Session.isHost and OptionsManager.isOption("REVL", "off") then
+	elseif Session.IsHost and OptionsManager.isOption("REVL", "off") then
 		rMessage.secret = true;
 	end
 
@@ -697,7 +697,7 @@ function messageResult(bSecret, rSource, rTarget, rMessageGM, rMessagePlayer)
 		rMessageGM.secret = true;
 		Comm.deliverChatMessage(rMessageGM, "");
 
-		if Session.isHost then
+		if Session.IsHost then
 			local aUsers = User.getActiveUsers();
 			if #aUsers > 0 then
 				Comm.deliverChatMessage(rMessagePlayer, aUsers);

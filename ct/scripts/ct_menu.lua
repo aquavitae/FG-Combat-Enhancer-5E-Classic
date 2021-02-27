@@ -1,7 +1,7 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 function onInit()
-	if Session.isHost then
+	if Session.IsHost then
 		registerMenuItem(Interface.getString("menu_init"), "turn", 7);
 		registerMenuItem(Interface.getString("menu_initall"), "shuffle", 7, 8);
 		registerMenuItem(Interface.getString("menu_initnpc"), "mask", 7, 7);
@@ -34,7 +34,7 @@ function onClickRelease(button, x, y)
 end
 
 function onMenuSelection(selection, subselection, subsubselection)
-	if Session.isHost then
+	if Session.IsHost then
 		if selection == 7 then
 			if subselection == 4 then
 				local nodeActiveCT = CombatManager.getActiveCT();

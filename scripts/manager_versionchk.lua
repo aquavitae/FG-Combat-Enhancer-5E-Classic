@@ -7,7 +7,7 @@
 local SUPPORTED_VERSION = "3.3.8";
 
 function onInit()
-	if Session.isHost then
+	if Session.IsHost then
 		local nMajor,nMinor,nSub = Interface.getVersion();
 		local sVersion =  tostring(nMajor) .. '.' .. tostring(nMinor) .. '.' .. tostring(nSub);
 		local extInfo = Extension.getExtensionInfo("5e Combat Enhancer");

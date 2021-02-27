@@ -344,7 +344,7 @@ function getTokenFromCT(vEntry)
 end
 
 function getCurrentUserCT()
-	if Session.isHost then
+	if Session.IsHost then
 		return getActiveCT();
 	end
 
@@ -431,7 +431,7 @@ function sortfuncSimple(node1, node2)
 end
 
 function sortfuncStandard(node1, node2)
-	local bHost = Session.isHost;
+	local bHost = Session.IsHost;
 	local sOptCTSI = OptionsManager.getOption("CTSI");
 
 	local sFaction1 = DB.getValue(node1, "friendfoe", "");
@@ -474,7 +474,7 @@ function sortfuncStandard(node1, node2)
 end
 
 function sortfuncDnD(node1, node2)
-	local bHost = Session.isHost;
+	local bHost = Session.IsHost;
 	local sOptCTSI = OptionsManager.getOption("CTSI");
 	local sOptCTSI = OptionsManager.getOption("CTSI");
 
@@ -625,7 +625,7 @@ end
 
 -- open entry if npc
 function openNPCEntry(sClass,nodeEntry)
-	if sClass == 'npc' and Session.isHost then
+	if sClass == 'npc' and Session.IsHost then
 		-- open the window
 		Interface.openWindow('npc',nodeEntry);
 	end
@@ -701,7 +701,7 @@ function centerOnToken(nodeEntry)
 end
 
 function nextActor(bSkipBell, bNoRoundAdvance)
-	if not Session.isHost then
+	if not Session.IsHost then
 		return;
 	end
 
@@ -801,7 +801,7 @@ function nextActor(bSkipBell, bNoRoundAdvance)
 end
 
 function nextRound(nRounds)
-	if not Session.isHost then
+	if not Session.IsHost then
 		return;
 	end
 
@@ -878,13 +878,13 @@ function onDrop(nodetype, nodename, draginfo)
 
 		-- Faction changes
 		if sDragType == "combattrackerff" then
-			if Session.isHost then
+			if Session.IsHost then
 				DB.setValue(ActorManager.getCTNode(rTarget), "friendfoe", "string", draginfo.getStringData());
 				return true;
 			end
 		-- Actor targeting
 		elseif sDragType == "targeting" then
-			if Session.isHost then
+			if Session.IsHost then
 				local _,sNodeSourceCT = draginfo.getShortcutData();
 				TargetingManager.addCTTarget(DB.findNode(sNodeSourceCT), ActorManager.getCTNode(rTarget));
 				return true;
@@ -1380,7 +1380,7 @@ end
 --
 
 function handleFactionDropOnImage(draginfo, imagecontrol, x, y)
-	if not Session.isHost then return; end
+	if not Session.IsHost then return; end
 
 	-- Determine image viewpoint
 	-- Handle zoom factor (>100% or <100%) and offset drop coordinates

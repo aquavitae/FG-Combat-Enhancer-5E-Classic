@@ -23,7 +23,7 @@ function action()
 	rRoll.sType = "effect";
 
 	local rTarget = nil;
-	if Session.isHost then
+	if Session.IsHost then
 		applyEffectOnOpenImageWindows(rRoll);
 	else
 		local iden = User.getCurrentIdentity();

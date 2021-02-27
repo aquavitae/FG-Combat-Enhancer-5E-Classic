@@ -261,7 +261,7 @@ function notifyApply(rEffect, vTargets)
 			end
 		end
 	end
-	if Session.isHost then
+	if Session.IsHost then
 		msgOOB.user = "";
 	else
 		msgOOB.user = User.getUsername();
@@ -386,7 +386,7 @@ function message(sMsg, nodeCTEntry, bGMOnly, sUser)
 		end
 	elseif bGMOnly then
 		msg.secret = true;
-		if Session.isHost then
+		if Session.IsHost then
 			Comm.addChatMessage(msg);
 		else
 			Comm.deliverChatMessage(msg, User.getUsername());
@@ -408,7 +408,7 @@ function getEffectString(nodeEffect, bPublicOnly)
 	if sLabel == "" then
 		bAddEffect = false;
 	elseif DB.getValue(nodeEffect, "isgmonly", 0) == 1 then
-		if Session.isHost and not bPublicOnly then
+		if Session.IsHost and not bPublicOnly then
 			bGMOnly = true;
 		else
 			bAddEffect = false;

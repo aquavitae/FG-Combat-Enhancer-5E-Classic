@@ -47,8 +47,9 @@
 			function onInit()
 				update()
 			end
+
 			function getImage()
-				if Session.isHost then
+				if Session.IsHost then
 					local activelayer = parentcontrol.window.layerEnabled()
 					if activelayer == "play_image" then
 						return parentcontrol.window.play_image
@@ -61,9 +62,10 @@
 					return parentcontrol.window.play_image
 				end
 			end
+
 			function update()
 				super.update()
-				if Session.isHost then
+				if Session.IsHost then
 					h4.setVisible(true)
 					toggle_layers_quick.setVisible(true)
 					toggle_layers.setVisible(true)
@@ -79,7 +81,7 @@
 				local activelayer = "play_image"
 				local bHasTokens = false;
 
-				if Session.isHost then
+				if Session.IsHost then
 					bHasTokens = getImage().hasTokens();
 					activelayer = parentcontrol.window.layerEnabled()
 					toolbar_clear_saves.setVisible(bHasTokens);
@@ -318,7 +320,7 @@
 			end
 
 			function getImage()
-				if Session.isHost then
+				if Session.IsHost then
 					local activelayer = parentcontrol.window.layerEnabled()
 					if activelayer == "play_image" then
 						return parentcontrol.window.play_image
@@ -335,7 +337,7 @@
 			function update()
 				local bHasTokens = getImage().hasTokens();
 
-				if Session.isHost then
+				if Session.IsHost then
 					toolbar_draw.setVisibility(true);
 					h2.setVisible(true);
 
@@ -363,7 +365,7 @@
 
 				local activelayer = "play_image";
 
-				if Session.isHost then
+				if Session.IsHost then
 					activelayer = parentcontrol.window.layerEnabled();
 					toolbar_clear_saves.setVisible(bHasTokens);
 				end

@@ -102,7 +102,7 @@ end
 -- NOTE: button (number), Returns a numerical value indicating the button pressed (1 = left, 2 = middle, 4 = button 4, 5 = button 5). Right button is used for radial menus.
 function onClickDown( token, button, image )
 	-- Deletes token from combat map, if Alt held on left mouse click.
-	if (Input.isAltPressed() == true) and (Session.isHost == true) and (button==1) then
+	if (Input.isAltPressed() == true) and (Session.IsHost == true) and (button==1) then
 		local nodeCT = CombatManager.getCTFromToken(token);
 		token.delete();
 
@@ -155,7 +155,7 @@ end
 function openTokenInformationWindow(tokenMap, vImage)
 	local nodeCT = CombatManager.getCTFromToken(tokenMap);
 	if nodeCT then
-		if Session.isHost then
+		if Session.IsHost then
 			local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
 			if sRecord ~= "" then
 				Interface.openWindow(sClass, sRecord);
@@ -256,9 +256,9 @@ function getTokenPlayer(token)
 		Debug.console('modifications>getTokenPlayer, nodeCt owner:', owner);
 		--- DB.isOwner( nodeid )
 
-		if Session.isHost then
+		if Session.IsHost then
 		end
-		if not Session.isHost then
+		if not Session.IsHost then
 		end
 	end
 end
@@ -279,7 +279,7 @@ end
 -- updated to refresh widgets for health bars when that menu option is toggled between horizontal and vertical health bars
 function onOptionChangedMenuSwitch(nodeOption)
 	local sKey = nodeOption.getName();
-	if not Session.isLocal then
+	if not Session.IsLocal then
 		CampaignRegistry["Opt" .. sKey] = getOption(sKey);
 	end
 

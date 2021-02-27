@@ -62,7 +62,7 @@ function onFilter(w)
 				return false;
 			end
 		end
-		if not Session.isHost and DB.getValue(dbNode,'isgmonly',0) == 1 then
+		if not Session.IsHost and DB.getValue(dbNode,'isgmonly',0) == 1 then
 			return false;
 		end
 		return true;

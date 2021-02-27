@@ -67,7 +67,7 @@ end
 ]]--
 
 function updateFromHost(OOBMsg)
-	if not Session.isHost then
+	if not Session.IsHost then
 		local nodeCT = DB.findNode(OOBMsg.dbref);
 
 		Debug.console('UPDATING TOKEN REFERENCE: Got force update from host');
@@ -265,7 +265,7 @@ function updateAttributesHelper(tokenCT, nodeCT)
 	if (HeightManager) then
 		HeightManager.setupToken(tokenCT);
 	end
-	if (MapTokenManager and Session.isHost) then
+	if (MapTokenManager and Session.IsHost) then
 		local sClass, sRef = DB.getValue(nodeCT,'link');
 		if sClass == 'npc' then
 			MapTokenManager.setupCombatTokenMenu(tokenCT);
@@ -278,7 +278,7 @@ function updateAttributesHelper(tokenCT, nodeCT)
 	end
 	--Debug.console("---updateAttributeHelper");
 	-- Force the client to update if the host updated
-	if Session.isHost then
+	if Session.IsHost then
 		-- if we're updating attributes, then the token is on the map
 		DB.setValue(nodeCT, "tokenonmap", "number", 1);
 		sendForceUpdateOOB(nodeCT);
@@ -684,7 +684,7 @@ function updateStatusOverlayWidget(tokenCT,nodeCT)
 		-- if we're Dead/Dying then make a splatter too!
 		if (sStatus:match("Dying") or
 		sStatus == "Dead") and
-		Session.isHost then
+		Session.IsHost then
 			createSplatter(tokenCT,nodeCT,'image');
 		end
 	elseif (sStatus == "Critical" or
@@ -1132,7 +1132,7 @@ function getConditionIconList(nodeCT, bSkipGMOnly)
 
 	for k,v in pairs(aSorted) do
 		if DB.getValue(v, "isactive", 0) == 1 then
-			if (not bSkipGMOnly and Session.isHost) or (DB.getValue(v, "isgmonly", 0) == 0) then
+			if (not bSkipGMOnly and Session.IsHost) or (DB.getValue(v, "isgmonly", 0) == 0) then
 				local sLabel = DB.getValue(v, "label", "");
 
 				local sEffect = nil;

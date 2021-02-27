@@ -8,7 +8,7 @@ local bDisplayDefaultEffects = false;
 local fGetEffectInfo = null;
 
 function onInit()
-	if Session.isHost then
+	if Session.IsHost then
 		Token.onContainerChanged = onContainerChanged;
 		Token.onTargetUpdate = onTargetUpdate;
 
@@ -113,7 +113,7 @@ end
 function onTokenDelete(tokenMap)
 	ImageManager.onTokenDelete(tokenMap);
 
-	if Session.isHost then
+	if Session.IsHost then
 		CombatManager.onTokenDelete(tokenMap);
 		PartyManager.onTokenDelete(tokenMap);
 	end
@@ -240,7 +240,7 @@ function onHover(tokenMap, bOver)
 			end
 		end
 
-		if Session.isHost then
+		if Session.IsHost then
 			hilightHover(tokenMap, bOver);
 		end
 
@@ -291,7 +291,7 @@ function onDoubleClick(tokenMap, vImage)
 	local nodeCT = CombatManager.getCTFromToken(tokenMap);
 	if Input.isShiftPressed() then
 		if nodeCT then
-			if Session.isHost then
+			if Session.IsHost then
 				local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
 				if sRecord ~= "" then
 					Interface.openWindow(sClass, sRecord);
@@ -334,7 +334,7 @@ function updateAttributesFromToken(tokenMap)
 		updateAttributesHelper(tokenMap, nodeCT);
 	end
 
-	if Session.isHost then
+	if Session.IsHost then
 		local nodePS = PartyManager.getNodeFromToken(tokenMap);
 		if nodePS then
 			tokenMap.setTargetable(false);
@@ -356,7 +356,7 @@ function updateAttributes(nodeField)
 end
 
 function updateAttributesHelper(tokenCT, nodeCT)
-	if Session.isHost then
+	if Session.IsHost then
 		tokenCT.setTargetable(true);
 		tokenCT.setActivable(true);
 
@@ -392,7 +392,7 @@ function updateTooltip(tokenCT, nodeCT)
 		return;
 	end
 
-	if Session.isHost then
+	if Session.IsHost then
 		local aTooltip = {};
 		local sFaction = DB.getValue(nodeCT, "friendfoe", "");
 
@@ -553,7 +553,7 @@ function updateOwner(nodePC)
 end
 
 function updateOwnerHelper(tokenCT, nodeCT)
-	if not Session.isHost then
+	if not Session.IsHost then
 		local bOwned = false;
 
 		local sClass, sRecord = DB.getValue(nodeCT, "link", "", "");
@@ -574,7 +574,7 @@ function updateActive(nodeField)
 end
 
 function updateActiveHelper(tokenCT, nodeCT)
-	if Session.isHost then
+	if Session.IsHost then
 		if tokenCT.isActivable() then
 			local bActive = (DB.getValue(nodeCT, "active", 0) == 1);
 			if bActive then
@@ -590,7 +590,7 @@ function updateFaction(nodeFaction)
 	local nodeCT = nodeFaction.getParent();
 	local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 	if tokenCT then
-		if Session.isHost then
+		if Session.IsHost then
 			updateFactionHelper(tokenCT, nodeCT);
 		end
 		updateTooltip(tokenCT, nodeCT);

@@ -30,7 +30,7 @@ function onButtonPress(x, y)
 	rRoll.sType = "effect";
 
 	local rTarget = nil;
-	if Session.isHost then
+	if Session.IsHost then
 		applyEffectOnOpenImageWindows(rRoll,rEffect);
 	else
 		local iden = User.getCurrentIdentity();

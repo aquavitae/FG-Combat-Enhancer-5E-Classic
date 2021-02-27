@@ -128,7 +128,7 @@ function setFactionTargets(vImage, bNegated)
 	end
 
 	-- Iterate through tracker to target correct faction
-	local bHost = Session.isHost;
+	local bHost = Session.IsHost;
 	local sContainer = vImage.getDatabaseNode().getNodeName();
 	for _,nodeCT in pairs(CombatManager.getCombatantNodes()) do
 		if DB.getValue(nodeCT, "tokenrefnode", "") == sContainer then
@@ -180,7 +180,7 @@ function notifyToggleTarget(nodeSourceCT, nodeTargetCT)
 	-- Build OOB message to pass toggle request to host
 	local msgOOB = {};
 	msgOOB.type = OOB_MSGTYPE_TOGGLETARGET;
-	if Session.isHost then
+	if Session.IsHost then
 		msgOOB.user = "";
 	else
 		msgOOB.user = User.getUsername();
@@ -476,7 +476,7 @@ function addHolders(tokenCT,nodeCT)
 
 	if nodeCT then
 		heightNode = nodeCT.createChild("height","number");
-		if heightNode and Session.isHost then
+		if heightNode and Session.IsHost then
 			-- get datasource, try to find the charsheet
 			-- if there's a charsheet, then get the list of users
 			-- find all identities own by each user, if an identity owned by a user

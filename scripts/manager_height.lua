@@ -78,7 +78,7 @@ function createHeightWidget(token)
 			local ct = hasCT(token);
 			if ct then
 				local heightNode = ct.createChild("height","number");
-				if Session.isHost then
+				if Session.IsHost then
 					addHolders(token);
 				end
 			end
@@ -101,7 +101,7 @@ function addHolders(token)
 
 	if ct then
 		heightNode = ct.createChild("height","number");
-		if heightNode and Session.isHost then
+		if heightNode and Session.IsHost then
 			-- get datasource, try to find the charsheet
 			-- if there's a charsheet, then get the list of users
 			-- find all identities own by each user, if an identity owned by a user

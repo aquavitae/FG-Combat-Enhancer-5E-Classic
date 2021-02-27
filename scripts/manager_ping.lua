@@ -82,7 +82,7 @@ end
 	Respond to the OOB if we're not the host
 ]]--
 function receivePingOOB(OOBMsg)
-	if not Session.isHost then
+	if not Session.IsHost then
 		--Debug.console("GOT PING OOB");
 		local x = OOBMsg.xcoord;
 		local y = OOBMsg.ycoord;

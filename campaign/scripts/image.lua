@@ -1,7 +1,7 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 function onInit()
-	if Session.isHost then
+	if Session.IsHost then
 		setTokenOrientationMode(false);
 		-- Setup map tokens;
 		MapTokenManager.initMapTokens(self);
@@ -26,7 +26,7 @@ end
 	Add additional visibility parameters
 ]]--
 function onTokenAdded(token)
-	if Session.isHost then
+	if Session.IsHost then
 		MapTokenManager.addAdditionalTokenMenus(token);
 	end
 end
@@ -35,7 +35,7 @@ end
 function onClickRelease(button, x, y)
 	local sTool = getCursorMode();
 
-	if Session.isHost and sTool == nil then
+	if Session.IsHost and sTool == nil then
 		--Debug.console('click release! no active tool!');
 		-- get location of mouse with respect to viewport + grid
 		local vpx, vpy, vpz = getViewpoint();
@@ -113,7 +113,7 @@ function onDrop(x, y, draginfo)
 	end
 
 	-- for the map tokens, we also want to ensure only the host can do this
-	if sDragType == "shortcut" and Session.isHost then
+	if sDragType == "shortcut" and Session.IsHost then
 		local dbref = draginfo.getDatabaseNode();
 		if dbref then
 			local nodeName = dbref.getNodeName();
@@ -142,7 +142,7 @@ function onDrop(x, y, draginfo)
 		end
 	elseif sDragType == "combattrackerff" then
 		return CombatManager.handleFactionDropOnImage(draginfo, self, x, y);
-	elseif sDragType == "token" and Session.isHost then
+	elseif sDragType == "token" and Session.IsHost then
 		-- MIGRATED to onDragEnd of the tokenfield
 	else
 		--Debug.console('drag type is : ' .. sDragType);
@@ -205,7 +205,7 @@ function onDrag(button, x, y, draginfo)
 		 -- update last x, y position with current coordinates
 		updateLastCoords(x,y);
 
-		if Session.isHost then
+		if Session.IsHost then
 			-- set the new viewpoint based upon current viewpoint + drag distance
 			window.image.setViewpoint(nx+dx, ny+dy, zoom);
 			-- sync viewpoints for all layers

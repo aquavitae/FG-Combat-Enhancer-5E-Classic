@@ -20,7 +20,7 @@ function onClickRelease(target, button, image)
 
 	-- Debug.console(sTokenCTNodePath);
 
-	if Session.isHost then
+	if Session.IsHost then
 		wCT = Interface.findWindow("combattracker_host","combattracker");
 	else
 		wCT = Interface.findWindow("combattracker_client","combattracker");
@@ -30,7 +30,7 @@ function onClickRelease(target, button, image)
 		-- Debug.console("we have the combat tracker window!");
 	else
 		-- Debug.console("Opening CT, it wasn't open");
-		if Session.isHost then
+		if Session.IsHost then
 			wCT = Interface.openWindow("combattracker_host","combattracker");
 		else
 			wCT = Interface.openWindow("combattracker_client","combattracker");
@@ -161,7 +161,7 @@ function doExpandHighlightEntry(ct_entry,toggle,bActive)
 	local bNPC = (sClass ~= "charsheet");
 
 	if toggle then
-		if Session.isHost then
+		if Session.IsHost then
 			if not bActive then
 				ct_entry.activateactive.setValue(1);
 				ct_entry.setActiveVisible();
@@ -175,7 +175,7 @@ function doExpandHighlightEntry(ct_entry,toggle,bActive)
 			ct_entry.activateeffects.setValue(1);
 		end
 	else
-		if Session.isHost then
+		if Session.IsHost then
 			if not bActive then
 				ct_entry.activateactive.setValue(0);
 				ct_entry.setActiveVisible();
@@ -195,7 +195,7 @@ end
 function getHighlightEntryFrame(sFaction,selected,bActive,sStatus)
 	local retval = nil;
 
-	if Session.isHost then
+	if Session.IsHost then
 		if bActive then
 			if sFaction == "friend" then
 				if sStatus == "Dead" or sStatus:match("Dying") then
@@ -407,7 +407,7 @@ function getHighlightEntryFrame(sFaction,selected,bActive,sStatus)
 end
 
 function customTurnStart(nodeCT)
-	if Session.isHost then
+	if Session.IsHost then
 		if nodeCT then
 			local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 			if tokenCT then
@@ -427,7 +427,7 @@ function customTurnStart(nodeCT)
 end
 
 function customTurnEnd(nodeCT)
-	if Session.isHost then
+	if Session.IsHost then
 		if nodeCT then
 			local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 			if tokenCT then

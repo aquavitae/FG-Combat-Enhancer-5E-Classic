@@ -59,9 +59,9 @@
 
 function toggleCharRecordIndex()
 	local sDisplayIndex;
-	if Session.isLocal then
+	if Session.IsLocal then
 		sDisplayIndex = "charselect_local";
-	elseif Session.isHost then
+	elseif Session.IsHost then
 		sDisplayIndex = "charselect_host";
 	else
 		sDisplayIndex = "charselect_client";
@@ -363,7 +363,7 @@ function getIndexDisplayClass(sRecordType)
 end
 function getIndexButtons(sRecordType)
 	if aRecords[sRecordType] then
-		if Session.isHost then
+		if Session.IsHost then
 			return (aRecords[sRecordType].aGMListButtons or {});
 		else
 			return (aRecords[sRecordType].aPlayerListButtons or {});
@@ -376,7 +376,7 @@ function addIndexButton(sRecordType, sButtonTemplate)
 		return;
 	end
 	if aRecords[sRecordType] then
-		if Session.isHost then
+		if Session.IsHost then
 			if not aRecords[sRecordType].aGMListButtons then
 				aRecords[sRecordType].aGMListButtons = {};
 			end
@@ -395,7 +395,7 @@ function addIndexButton(sRecordType, sButtonTemplate)
 end
 function getEditButtons(sRecordType)
 	if aRecords[sRecordType] then
-		if Session.isHost then
+		if Session.IsHost then
 			return (aRecords[sRecordType].aGMEditButtons or {});
 		else
 			return (aRecords[sRecordType].aPlayerEditButtons or {});
@@ -484,7 +484,7 @@ function getIDState(sRecordType, vNode, bIgnoreHost)
 		if aRecords[sRecordType].fGetIDState then
 			bID = aRecords[sRecordType].fGetIDState(vNode, bIgnoreHost);
 		else
-			if (bIgnoreHost or not Session.isHost) then
+			if (bIgnoreHost or not Session.IsHost) then
 				bID = (DB.getValue(vNode, "isidentified", 1) == 1);
 			end
 		end
@@ -521,14 +521,14 @@ function allowEdit(sRecordType)
 		local vEditMode = aRecords[sRecordType].sEditMode;
 		if vEditMode then
 			if vEditMode == "play" then
-				return not Session.isLocal;
+				return not Session.IsLocal;
 			elseif vEditMode == "none" then
 				return false;
 			end
 		end
 
 		-- Default behavior (host only editing, no local or player)
-		if Session.isHost then
+		if Session.IsHost then
 			return true;
 		end
 	end

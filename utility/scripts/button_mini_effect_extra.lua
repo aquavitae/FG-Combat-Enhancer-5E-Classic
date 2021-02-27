@@ -28,7 +28,7 @@ function onButtonPress(x, y)
 		return true;
 	end
 
-	if not Session.isHost then
+	if not Session.IsHost then
 		local iden = User.getCurrentIdentity();
 		if not iden then
 			Comm.addChatMessage({text="Select an identity first before attempting to apply an effect!",secret=true});
@@ -62,7 +62,7 @@ function onButtonPress(x, y)
 		Debug.console('targeted mode is active');
 		tokenCT = CombatManager.getCTFromToken(contextToken);
 		if tokenCT then
-			if not Session.isHost then
+			if not Session.IsHost then
 				local sFaction = DB.getValue(tokenCT, "friendfoe", "");
 				if sFaction ~= 'friend' then
 					Comm.addChatMessage({text="You cannont put effects for targets of a token you do not control",secret=true});
@@ -86,7 +86,7 @@ function onButtonPress(x, y)
 --[[
 	rRoll.sType = "effect";
 	local rTarget = nil;
-	if Session.isHost then
+	if Session.IsHost then
 		applyEffectOnOpenImageWindows(rRoll,rEffect);
 	else
 		local iden = User.getCurrentIdentity();

@@ -435,7 +435,7 @@ end
 
 ]]--
 function onMapTokenDoubleClick(tokenMap, vImage)
-	if Input.isShiftPressed() and Session.isHost then
+	if Input.isShiftPressed() and Session.IsHost then
 		local npcTokenList = DB.findNode(MAP_NPC_TOKEN_LIST);
 		if npcTokenList then
 			--Debug.console('MC- npc token list found');

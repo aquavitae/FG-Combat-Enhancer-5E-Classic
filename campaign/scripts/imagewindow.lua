@@ -17,7 +17,7 @@ function onInit()
 
 	updateDisplay();
 
-	if not Session.isHost then
+	if not Session.IsHost then
 		DB.addHandler(DB.getPath(getDatabaseNode(), "locked"), "onUpdate", onLockChanged);
 	end
 
@@ -40,7 +40,7 @@ function onInit()
 
 	--imageLayerShortcuts = imageLayerDBNode.getChild("shortcuts");
 
-	if Session.isHost  then
+	if Session.IsHost  then
 		-- make the toolbar visible
 		--toggle_toolbars.setVisible(true);
 
@@ -92,7 +92,7 @@ function onClose()
 
 	ImageManager.unregisterImage(image);
 
-	if not Session.isHost then
+	if not Session.IsHost then
 		DB.removeHandler(DB.getPath(getDatabaseNode(), "locked"), "onUpdate", onLockChanged);
 	end
 end
@@ -170,7 +170,7 @@ function updateToolbarState()
 	if not toolbar then return; end
 	local bShowToolbar = false;
 	local nodeRecord = getDatabaseNode();
-	if Session.isHost then
+	if Session.IsHost then
 		--bShowToolbar = not WindowManager.getReadOnlyState(nodeRecord);
 		bShowToolbar = true;
 	else
@@ -412,7 +412,7 @@ end
 
 function syncToPlayImageGrid(layercontrol)
 
-	if Session.isHost then
+	if Session.IsHost then
 		-- determine if this is a new grid being added on any layer
 		if layercontrol then
 			if layercontrol.hasGrid() and not play_image.hasGrid() then
@@ -463,7 +463,7 @@ end
 function removeGrid()
 	--Debug.console("imagewindow.lua: removeGrid");
 	-- Disable the grid on all layers
-	if Session.isHost then
+	if Session.IsHost then
 		play_image.setGridSize(0);
 		features_image.setGridSize(0);
 		image.setGridSize(0);

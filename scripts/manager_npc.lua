@@ -1,7 +1,7 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 function onInit()
-	if Session.isHost then
+	if Session.IsHost then
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH, "isidentified"), "onUpdate", onCTEntryIDUpdate);
 		DB.addHandler(DB.getPath("npc.*", "isidentified"), "onUpdate", onNPCEntryIDUpdate);
 	end

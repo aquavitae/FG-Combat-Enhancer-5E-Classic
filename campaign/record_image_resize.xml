@@ -86,7 +86,7 @@
 		<frame>imagebox_header</frame>
 		<script>
 			function onInit()
-				if Session.isHost then
+				if Session.IsHost then
 					nonid_name.resetAnchor("left");
 					nonid_name.setAnchor("left", nil, "center", "absolute", 10);
 					self.onSizeChanged = update;
@@ -102,7 +102,7 @@
 				nonid_name.setReadOnly(bReadOnly);
 
 				local bID = LibraryData.getIDState("image", nodeRecord);
-				if Session.isHost then
+				if Session.IsHost then
 					local w,h = getSize();
 					local bShowNonID = (w >= 450);
 					isidentified.setVisible(bShowNonID);
@@ -146,7 +146,7 @@
 			function update()
 				local bHasTokens = getImage().hasTokens();
 
-				if Session.isHost then
+				if Session.IsHost then
 					toolbar_draw.setVisibility(true);
 					h2.setVisible(true);
 
@@ -446,7 +446,7 @@
 			function update()
 				local bHasTokens = getImage().hasTokens();
 
-				if Session.isHost then
+				if Session.IsHost then
 					toolbar_draw.setVisibility(true);
 					h2.setVisible(true);
 

@@ -282,7 +282,7 @@ end
 
 function activeHighlight(active)
 	--Debug.console('NAME: ' .. self.getDatabaseNode().getChild('name').getValue()  .. ' ACTIVE: ' .. tostring(active));
-	if Session.isHost then
+	if Session.IsHost then
 		local nodeCT = self.getDatabaseNode();
 		if active and nodeCT then
 			local tokenCT = CombatManager.getTokenFromCT(nodeCT);
