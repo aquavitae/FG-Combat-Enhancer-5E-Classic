@@ -103,7 +103,6 @@ function updateDisplay()
 			end
 		end
 	end
-	--onIDChanged();
 end
 
 function onActiveChanged()

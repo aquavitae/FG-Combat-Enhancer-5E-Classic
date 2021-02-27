@@ -24,7 +24,6 @@ local aEffectVarMap = {
 -- NOTE: isactive is a DB field that is part of all CT effects, but not tracked in the effect record
 
 function onInit()
-	--Debug.console("CUSTOM EFFECT MANAGER LOADED");
 	CombatManager.setCustomInitChange(processEffects);
 
 	OOBManager.registerOOBMsgHandler(OOB_MSGTYPE_APPLYEFF, handleApplyEffect);
