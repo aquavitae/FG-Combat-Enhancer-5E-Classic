@@ -23,14 +23,14 @@ function showLayerTokens(windowinstance, sourcelayer, targetlayer)
 		-- Get the features_image layer global token scale
 		sourceLayerScale = windowinstance.features_image.getTokenScale();
 		-- Get image zoom level
-		_, _, sourceViewpointZoom = windowinstance.features_image.getViewpoint();		
+		_, _, sourceViewpointZoom = windowinstance.features_image.getViewpoint();
 		aSourceLayerTokens = windowinstance.features_image.getTokens();
 		-- xFL has a space after in order to have readable tooltip names.  this space will be removed by FG if there is no previous token name to leave "xFL"
 		tokenIdentifier = "xFL ";
 	else
 		-- no valid source layer passed, exit function
 		return 0;
-	end		
+	end
 
 	-- Get the token scale for the target layer
 	if targetlayer == "image" then
@@ -42,26 +42,26 @@ function showLayerTokens(windowinstance, sourcelayer, targetlayer)
 		-- Get the features_image layer global token scale
 		targetLayerScale = windowinstance.features_image.getTokenScale();
 		-- Get image zoom level
-		_, _, targetViewpointZoom = windowinstance.features_image.getViewpoint();		
+		_, _, targetViewpointZoom = windowinstance.features_image.getViewpoint();
 	else
 		-- no valid image layer passed, exit function
 		return 0;
-	end	
-	
-	if targetLayerScale == nil then 
+	end
+
+	if targetLayerScale == nil then
 		targetLayerScale = 1 * targetViewpointZoom;
 	end
-	if sourceLayerScale == nil then 
+	if sourceLayerScale == nil then
 		sourceLayerScale = 1 * sourceViewpointZoom;
 	end
-	
+
 	--Debug.console("Image zoom levels.  Source = " .. sourceViewpointZoom .. ", Target = " .. targetViewpointZoom);
-	
+
 	-- Set overall image scale factor - the factor needed to scale the local token shadow based off source and target image global token scale
 	local imageScaleFactor = targetLayerScale / sourceLayerScale;
-	
+
 	--Debug.console("Source image token scale = " .. sourceLayerScale .. ", target image token scale = " .. targetLayerScale .. ", scale factor = " .. imageScaleFactor);
-	
+
 	for _,vToken in ipairs(aSourceLayerTokens) do
 		local sourceLayerTokenPrototype = vToken.getPrototype();
 		local tokenX, tokenY = vToken.getPosition();
@@ -73,26 +73,26 @@ function showLayerTokens(windowinstance, sourcelayer, targetlayer)
 		-- Add token shadow to the specified layer
 		if targetlayer == "image" then
 			-- Get the image layer global token scale
-			targetLayerScale = windowinstance.image.getTokenScale();		
+			targetLayerScale = windowinstance.image.getTokenScale();
 			newImageLayerToken = windowinstance.image.addToken(sourceLayerTokenPrototype, tokenX, tokenY);
 		elseif targetlayer == "features_image" then
 			-- Get the image layer global token scale
-			targetLayerScale = windowinstance.features_image.getTokenScale();		
+			targetLayerScale = windowinstance.features_image.getTokenScale();
 			newImageLayerToken = windowinstance.features_image.addToken(sourceLayerTokenPrototype, tokenX, tokenY);
 		else
 			-- no valid image layer passed, exit function
 			return 0;
-		end		
-		
+		end
+
 		-- "xPL " added to token name to differentiate between eXtension added Player Player tokens and tokens already on the layer.  Needed for removing when the layer is left.
 		newImageLayerToken.setName(tokenIdentifier .. tokenName);
-		
+
 		-- Set the token scale to be the same as the original token - allows large, huge, etc. creatures to be shown correctly.  Apply scaling factor for different in global layer token scale.
 		newImageLayerToken.setScale(tokenScale * imageScaleFactor);
-		
+
 		-- Set the token orientation
 		newImageLayerToken.setOrientation(tokenOrientation);
-		
+
 		-- Token not visible to client - and also shows the token slightly transparent to indicate that the token is not from the currently selected layer.
 		newImageLayerToken.setVisible(false);
 	end

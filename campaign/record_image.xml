@@ -104,6 +104,11 @@
 		</script>
 		<sheetdata>
 
+			<genericcontrol name="toolbar_anchor_left" insertbefore="h3">
+				<anchored position="insidetopleft" offset="10,1" width="0" height="34" />
+				<disabled />
+			</genericcontrol>
+
 			<!-- Drawing section (mask/draw/erease) -->
 			<toolbar_30 name="toolbar_draw" merge="join">
 				<script>
@@ -175,8 +180,8 @@
 			</toolbar_30>
 
 			<!-- Layers section -->
-			<genericcontrol name="h4" insertbefore="h2">
-				<anchored to="toolbar_anchor" width="5" height="34">
+			<genericcontrol name="h4" insertbefore="h3">
+				<anchored to="toolbar_anchor_left" width="1" height="34">
 					<top />
 					<left anchor="right" relation="relative" />
 				</anchored>
@@ -184,8 +189,8 @@
 			</genericcontrol>
 
 			<!-- Toggle play and background layer button -->
-			<buttoncontrol name="toggle_layers_quick" insertbefore="h2">
-				<anchored to="toolbar_anchor" width="34" height="34">
+			<buttoncontrol name="toggle_layers_quick" insertbefore="h3">
+				<anchored to="toolbar_anchor_left" width="34" height="34">
 					<top />
 					<left anchor="right" relation="relative" />
 				</anchored>
@@ -211,7 +216,7 @@
 				</script>
 			</buttoncontrol>
 			<buttoncontrol name="toggle_layers" insertbefore="h2">
-				<anchored to="toolbar_anchor" width="34" height="34">
+				<anchored to="toolbar_anchor_left" width="34" height="34">
 					<top />
 					<left anchor="right" relation="relative" />
 				</anchored>
@@ -237,7 +242,7 @@
 				</script>
 			</buttoncontrol>
 			<toolbar_30 name="toolbar_layers" insertbefore="h2">
-				<anchored to="toolbar_anchor">
+				<anchored to="toolbar_anchor_left">
 					<top />
 					<left anchor="right" relation="relative" />
 				</anchored>
@@ -282,7 +287,7 @@
 
 			<!-- Clear saves button on toolbar -->
 			<buttoncontrol name="toolbar_clear_saves">
-				<anchored to="toolbar_anchor" width="34" height="34">
+				<anchored to="toolbar_anchor_left" width="34" height="34">
 					<top />
 					<left anchor="right" relation="relative" />
 				</anchored>

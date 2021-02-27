@@ -123,9 +123,9 @@ function onClose()
 	super.onClose()
 end
 
-function onToolbarChanged()
+function onToolbarChanged(nState)
 	if super and super.onToolbarChanged then
-		super.onToolbarChanged()
+		super.onToolbarChanged(nState)
 	end
 	syncLayerSizeToBaseImage();
 end
@@ -513,8 +513,3 @@ end
 function onMove()
 	playerWindowOpened()
 end
-
-
-
-
-
