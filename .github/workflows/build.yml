@@ -27,7 +27,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: zip "5e Combat Enhancer Classic v1_7_0.ext" -x '*.git*' .
+        run: zip -r -x '*.git*' "5e Combat Enhancer Classic v1_7_0.ext" .
 
       - uses: actions/upload-artifact@v2.2.2
         with:
