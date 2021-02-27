@@ -1,7 +1,7 @@
 --  Please see the COPYRIGHT.txt file included with this distribution for attribution and copyright information.
 
 function onInit()
-	--Debug.console('CLient CTENTRY Init: ' .. self.getDatabaseNode().getPath()); 
+	--Debug.console('CLient CTENTRY Init: ' .. self.getDatabaseNode().getPath());
 	onIDChanged();
 	onFactionChanged();
 	onHealthChanged();
@@ -9,25 +9,25 @@ end
 
 function updateDisplay()
 	local sFaction = friendfoe.getStringValue();
-	local nPercentWounded, sStatus = ActorManager2.getPercentWounded2("ct", self.getDatabaseNode());
+	local nPercentWounded, sStatus = ActorManager5E.getWoundPercent(self.getDatabaseNode());
 	local sOptCTSI = OptionsManager.getOption("CTSI");
 	local bShowInit = ((sOptCTSI == "friend") and (sFaction == "friend")) or (sOptCTSI == "on");
-	initresult.setVisible(bShowInit);	
+	initresult.setVisible(bShowInit);
 
-	--Debug.console("Client CTENTRY Update: " .. self.getDatabaseNode().getPath()); 
-	
+	--Debug.console("Client CTENTRY Update: " .. self.getDatabaseNode().getPath());
+
 	if active.getValue() == 1 then
 		name.setFont("sheetlabel");
 		nonid_name.setFont("sheetlabel");
 
 		active_spacer_top.setVisible(true);
 		active_spacer_bottom.setVisible(true);
-		
+
 		if sFaction == "friend" then
 			if sStatus == "Dying" or sStatus == "Dead" then
-				setFrame("ctentrybox_friend_active_dark"); 
+				setFrame("ctentrybox_friend_active_dark");
 			elseif sStatus == "Unconscious" then
-				setFrame("ctentrybox_friend_active_uncon"); 
+				setFrame("ctentrybox_friend_active_uncon");
 			else
 				setFrame("ctentrybox_friend_active");
 			end
@@ -35,15 +35,15 @@ function updateDisplay()
 			if sStatus == "Dying" or sStatus == "Dead" then
 				setFrame("ctentrybox_neutral_active_dark");
 			elseif sStatus == "Unconscious" then
-				setFrame("ctentrybox_friend_active_uncon"); 
+				setFrame("ctentrybox_friend_active_uncon");
 			else
 				setFrame("ctentrybox_neutral_active");
 			end
-		elseif sFaction == "foe" then		
-			if sStatus == "Dying" or sStatus == "Dead" then	
-				if (OptionsManager.getOption('CE_CTFNPC') == 'on') then			
+		elseif sFaction == "foe" then
+			if sStatus == "Dying" or sStatus == "Dead" then
+				if (OptionsManager.getOption('CE_CTFNPC') == 'on') then
 					setFrame("ctentrybox_foe_active_dark");
-				end					
+				end
 			elseif sStatus == "Unconscious" then
 				setFrame("ctentrybox_foe_active_uncon");
 			else
@@ -66,7 +66,7 @@ function updateDisplay()
 
 		active_spacer_top.setVisible(false);
 		active_spacer_bottom.setVisible(false);
-		
+
 		if sFaction == "friend" then
 			if sStatus == "Dying" or sStatus == "Dead" then
 				setFrame("ctentrybox_friend_dark");
@@ -83,11 +83,11 @@ function updateDisplay()
 			else
 				setFrame("ctentrybox_neutral");
 			end
-		elseif sFaction == "foe" then			
+		elseif sFaction == "foe" then
 			if sStatus == "Dying" or sStatus == "Dead" then
 				if (OptionsManager.getOption('CE_CTFNPC') == 'on') then
-					setFrame("ctentrybox_foe_dark");				
-				end					
+					setFrame("ctentrybox_foe_dark");
+				end
 			elseif sStatus == "Unconscious" then
 				setFrame("ctentrybox_foe_uncon");
 			else
@@ -103,7 +103,7 @@ function updateDisplay()
 			end
 		end
 	end
-	--onIDChanged(); 
+	--onIDChanged();
 end
 
 function onActiveChanged()
@@ -146,7 +146,7 @@ function updateHealthDisplay()
 	else
 		sOption = OptionsManager.getOption("SHNPC");
 	end
-	
+
 	if sOption == "detailed" then
 		hptotal.setVisible(true);
 		hptemp.setVisible(true);

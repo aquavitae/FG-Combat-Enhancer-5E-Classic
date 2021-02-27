@@ -10,19 +10,19 @@ function onInit()
 
 	-- Acquire token reference, if any
 	linkToken();
-	
+
 	-- Set up the PC links
 	onLinkChanged();
-	
+
 	-- Update the displays
 	onFactionChanged();
 	onHealthChanged();
-	
+
 	-- Register the deletion menu item for the host
 	registerMenuItem(Interface.getString("list_menu_deleteitem"), "delete", 6);
 	registerMenuItem(Interface.getString("list_menu_deleteconfirm"), "delete", 6, 7);
 	-- Handle token updates (for widget)
-	updateOnMapWidget(); 
+	updateOnMapWidget();
     	DB.addHandler(self.getDatabaseNode().getPath() .. ".tokenonmap", "onUpdate", updateOnMapWidget);
 	-- add listener for NPC
 	OptionsManager.registerCallback("NPID", onIDChanged);
@@ -33,7 +33,7 @@ function onClose()
 end
 
 function updateOnMapWidget(nodefield)
-	self.token.onPlacementChanged(); 
+	self.token.onPlacementChanged();
 end
 
 --
@@ -46,39 +46,39 @@ end
 
 function onIDChanged()
 	-- iterate through our list of window entries
-	-- 
-	updateName(); 
+	--
+	updateName();
 end
 
 function updateName()
 	local nodeNPCRecord = DB.findNode(DB.getValue(getDatabaseNode(),'npclistref',''));
-	local nodeRecord = getDatabaseNode(); 
+	local nodeRecord = getDatabaseNode();
 	local sLinkType = DB.getValue(getDatabaseNode(),'link');
-	--Debug.console('CT_ENTRY NPID updatename linktype: ' .. sLinkType .. ' NPCRecord: ' .. tostring(nodeNPCRecord)); 
+	--Debug.console('CT_ENTRY NPID updatename linktype: ' .. sLinkType .. ' NPCRecord: ' .. tostring(nodeNPCRecord));
 
 	if sLinkType == 'npc' and nodeNPCRecord ~= nil then
-		local bID, bOptionID = LibraryData.getIDState("npc",sLinkRecord,true); 
+		local bID, bOptionID = LibraryData.getIDState("npc",sLinkRecord,true);
 		local sTrueName = DB.getValue(DB.getPath(nodeNPCRecord, "name"), "");
 		local sNonIDName = DB.getValue(DB.getPath(nodeNPCRecord, "nonid_name"), "");
 		local sCurName, sNumber = CombatManager.stripCreatureNumber(name.getValue());
-		local nodeCTIdentified = nodeRecord.createChild('isidentified','number'); 
-		local sSuffix = ''; 
+		local nodeCTIdentified = nodeRecord.createChild('isidentified','number');
+		local sSuffix = '';
 
 		-- if nonIDName is not set, the put in default
 		if sNonIDName == '' then
-			sNonIDName = Interface.getString("library_recordtype_empty_nonid_npc"); 
+			sNonIDName = Interface.getString("library_recordtype_empty_nonid_npc");
 		end
 
 		if sNumber ~= nil then
-			sSuffix = ' ' .. sNumber; 
+			sSuffix = ' ' .. sNumber;
 		end
 
-		-- if NPID is on 
+		-- if NPID is on
 		if not bID then
-			name.setValue(sNonIDName .. sSuffix); 
-			Debug.console('Changing CT name to (NID)' .. sNonIDName .. sSuffix); 
+			name.setValue(sNonIDName .. sSuffix);
+			Debug.console('Changing CT name to (NID)' .. sNonIDName .. sSuffix);
 		else
-			name.setValue(sTrueName .. sSuffix); 
+			name.setValue(sTrueName .. sSuffix);
 		end
 	end
 end
@@ -86,21 +86,21 @@ end
 
 function updateDisplay()
 	local sFaction = friendfoe.getStringValue();
-	local nPercentWounded, sStatus = ActorManager2.getPercentWounded2("ct", self.getDatabaseNode());
-	--Debug.console("UPDATE DISPLAY (ct entry) " .. sStatus); 	
+	local nPercentWounded, sStatus = ActorManager5E.getWoundPercent(self.getDatabaseNode());
+	--Debug.console("UPDATE DISPLAY (ct entry) " .. sStatus);
 
 	if DB.getValue(getDatabaseNode(), "active", 0) == 1 then
 		name.setFont("sheetlabel");
 		nonid_name.setFont("sheetlabel");
-		
+
 		active_spacer_top.setVisible(true);
 		active_spacer_bottom.setVisible(true);
-		
+
 		if sFaction == "friend" then
 			if sStatus:match("Dying") or sStatus == "Dead" then
-				setFrame("ctentrybox_friend_active_dark"); 
+				setFrame("ctentrybox_friend_active_dark");
 			elseif sStatus == "Unconscious" then
-				setFrame("ctentrybox_friend_active_uncon"); 
+				setFrame("ctentrybox_friend_active_uncon");
 			else
 				setFrame("ctentrybox_friend_active");
 			end
@@ -108,13 +108,13 @@ function updateDisplay()
 			if sStatus:match("Dying") or sStatus == "Dead" then
 				setFrame("ctentrybox_neutral_active_dark");
 			elseif sStatus == "Unconscious" then
-				setFrame("ctentrybox_friend_active_uncon"); 
+				setFrame("ctentrybox_friend_active_uncon");
 			else
 				setFrame("ctentrybox_neutral_active");
 			end
-		elseif sFaction == "foe" then			
-			if sStatus:match("Dying") or sStatus == "Dead" then								
-				if (OptionsManager.getOption('CE_CTFNPC') == 'on') then				
+		elseif sFaction == "foe" then
+			if sStatus:match("Dying") or sStatus == "Dead" then
+				if (OptionsManager.getOption('CE_CTFNPC') == 'on') then
 					setFrame("ctentrybox_foe_active_dark");
 				end
 			elseif sStatus == "Unconscious" then
@@ -135,10 +135,10 @@ function updateDisplay()
 	else
 		name.setFont("sheettext");
 		nonid_name.setFont("sheettext");
-		
+
 		active_spacer_top.setVisible(false);
 		active_spacer_bottom.setVisible(false);
-		
+
 		if sFaction == "friend" then
 			if sStatus:match("Dying") or sStatus == "Dead" then
 				setFrame("ctentrybox_friend_dark");
@@ -156,10 +156,10 @@ function updateDisplay()
 				setFrame("ctentrybox_neutral");
 			end
 		elseif sFaction == "foe" then
-			if sStatus:match("Dying") or sStatus == "Dead" then				
+			if sStatus:match("Dying") or sStatus == "Dead" then
 				if (OptionsManager.getOption('CE_CTFNPC') == 'on') then
 					setFrame("ctentrybox_foe_dark");
-				end					
+				end
 			elseif sStatus == "Unconscious" then
 				setFrame("ctentrybox_foe_uncon");
 			else
@@ -181,7 +181,7 @@ function linkToken()
 	local imageinstance = token.populateFromImageNode(tokenrefnode.getValue(), tokenrefid.getValue());
 	if imageinstance then
 		TokenManager.linkToken(getDatabaseNode(), imageinstance);
-		TokenManager.updateAttributes(tokenrefid.getDatabaseNode()); 
+		TokenManager.updateAttributes(tokenrefid.getDatabaseNode());
 	end
 end
 
@@ -197,10 +197,10 @@ function delete()
 		close();
 		return;
 	end
-	
+
 	-- Remember node name
 	local sNode = node.getNodeName();
-	
+
 	-- Clear any effects first, so that saves aren't triggered when initiative advanced
 	effects.reset(false);
 
@@ -274,38 +274,38 @@ function onVisibilityChanged()
 end
 
 function onActiveChanged()
-	local isActive = (self.getDatabaseNode().getChild('active').getValue() == 1); 
+	local isActive = (self.getDatabaseNode().getChild('active').getValue() == 1);
 	setActiveVisible();
-	activeHighlight(isActive); 
+	activeHighlight(isActive);
 end
 
 function activeHighlight(active)
-	--Debug.console('NAME: ' .. self.getDatabaseNode().getChild('name').getValue()  .. ' ACTIVE: ' .. tostring(active)); 
+	--Debug.console('NAME: ' .. self.getDatabaseNode().getChild('name').getValue()  .. ' ACTIVE: ' .. tostring(active));
 	if User.isHost() then
-		local nodeCT = self.getDatabaseNode(); 
+		local nodeCT = self.getDatabaseNode();
 		if active and nodeCT then
 			local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 			if tokenCT then
 				-- the token exists
-				local space = nodeCT.getChild('space');  
-				if space == nil then 
+				local space = nodeCT.getChild('space');
+				if space == nil then
 					space = 1;
 				else
-					space = space.getValue()/5/2+0.5; 
+					space = space.getValue()/5/2+0.5;
 				end
 
-				local childs = nodeCT.getChildren(); 
+				local childs = nodeCT.getChildren();
 				for k,v in pairs(childs) do
-					--Debug.console('k: ' .. k .. ' v: ' .. tostring(v)); 	
+					--Debug.console('k: ' .. k .. ' v: ' .. tostring(v));
 				end
-				--Debug.console('space is ' .. space); 
-				tokenCT.addUnderlay(space, CombatEnhancer.TOKENUNDERLAYCOLOR_1); 
+				--Debug.console('space is ' .. space);
+				tokenCT.addUnderlay(space, CombatEnhancer.TOKENUNDERLAYCOLOR_1);
 			end
 		elseif nodeCT then
 			local tokenCT = CombatManager.getTokenFromCT(nodeCT);
 			if tokenCT then
 				-- the token exists
-				tokenCT.removeAllUnderlays(); 
+				tokenCT.removeAllUnderlays();
 			end
 		end
 	end
@@ -346,9 +346,9 @@ function setTargetingVisible()
 	end
 
 	targetingicon.setVisible(v);
-	
+
 	sub_targeting.setVisible(v);
-	
+
 	frame_targeting.setVisible(v);
 
 	target_summary.onTargetsChanged();
@@ -359,7 +359,7 @@ function setAttributesVisible()
 	if activateattributes.getValue() == 1 then
 		v = true;
 	end
-	
+
 	attributesicon.setVisible(v);
 
 	strength.setVisible(v);
@@ -374,9 +374,9 @@ function setAttributesVisible()
 	wisdom_label.setVisible(v);
 	charisma.setVisible(v);
 	charisma_label.setVisible(v);
-	
+
 	spacer_attribute.setVisible(v);
-	
+
 	frame_attributes.setVisible(v);
 end
 
@@ -391,7 +391,7 @@ function setActiveVisible()
 	if bNPC and active.getValue() == 1 then
 		v = true;
 	end
-	
+
 	activeicon.setVisible(v);
 
 	reaction.setVisible(v);
@@ -402,9 +402,9 @@ function setActiveVisible()
 	aclabel.setVisible(v);
 	speed.setVisible(v);
 	speedlabel.setVisible(v);
-	
+
 	spacer_action.setVisible(v);
-	
+
 	if bNPC and traits.getWindowCount() > 0 then
 		traits.setVisible(v);
 		traits_label.setVisible(v);
@@ -422,7 +422,7 @@ function setActiveVisible()
 		actions_label.setVisible(false);
 		actions_emptyadd.setVisible(false);
 	end
-	
+
 	if bNPC and reactions.getWindowCount() > 0 then
 		reactions.setVisible(v);
 		reactions_label.setVisible(v);
@@ -465,7 +465,7 @@ function setActiveVisible()
 	end
 
 	spacer_action2.setVisible(v);
-	
+
 	frame_active.setVisible(v);
 end
 
@@ -476,12 +476,12 @@ function setSpacingVisible(v)
 	end
 
 	spacingicon.setVisible(v);
-	
+
 	space.setVisible(v);
 	spacelabel.setVisible(v);
 	reach.setVisible(v);
 	reachlabel.setVisible(v);
-	
+
 	spacer_space.setVisible(v);
 
 	frame_spacing.setVisible(v);
@@ -492,61 +492,61 @@ function setEffectsVisible(v)
 	if activateeffects.getValue() == 1 then
 		v = true;
 	end
-	
+
 	effecticon.setVisible(v);
-	
+
 	effects.setVisible(v);
 	effects_iadd.setVisible(v);
 	for _,w in pairs(effects.getWindows()) do
 		w.idelete.setValue(0);
 	end
-	
+
 	frame_effects.setVisible(v);
 
 	effect_summary.onEffectsChanged();
 end
 
 function onDrop(x,y,dragdata)
-	local sType = dragdata.getType(); 
-	--Debug.console('ctentry windowinstance onDrop -- type: ' .. sType); 
-	--Diagnostics.dumpDragData(dragdata); 
+	local sType = dragdata.getType();
+	--Debug.console('ctentry windowinstance onDrop -- type: ' .. sType);
+	--Diagnostics.dumpDragData(dragdata);
 
 
 	if sType == 'token' then
 		--nodeCT = CTDragManager.getData();
-		--CTDragManager.setData(nil); 
-		nodeCT = dragdata.getCustomData(); 
+		--CTDragManager.setData(nil);
+		nodeCT = dragdata.getCustomData();
 		if nodeCT then
-			--Debug.console('ctnode: ' .. nodeCT.getPath()); 
+			--Debug.console('ctnode: ' .. nodeCT.getPath());
 
 			local nInit = DB.getValue(self.getDatabaseNode(),'initresult',0);
-			local nOtherInit = DB.getValue(nodeCT,'initresult',0); 
-			local nGreaterInit; 
-			local nNewInit; 
-			--Debug.console('target init: ' .. nInit); 
-			--Debug.console('drag init: ' .. nOtherInit); 
+			local nOtherInit = DB.getValue(nodeCT,'initresult',0);
+			local nGreaterInit;
+			local nNewInit;
+			--Debug.console('target init: ' .. nInit);
+			--Debug.console('drag init: ' .. nOtherInit);
 			-- find ct entries with greater init
-			local wnds = windowlist.getWindows(); 
+			local wnds = windowlist.getWindows();
 			for _,v in pairs(wnds) do
-				nCurInit = DB.getValue(v.getDatabaseNode(),'initresult',0); 
+				nCurInit = DB.getValue(v.getDatabaseNode(),'initresult',0);
 				if nCurInit > nInit then
 					if not nGreaterInit then
 						nGreaterInit = nCurInit;
 					elseif nCurInit < nGreaterInit then
-						nGreaterInit = nCurInit; 
+						nGreaterInit = nCurInit;
 					end
 				end
 			end
 			-- if no greater, init +1
-			--Debug.console('greater: ' .. tostring(nGreaterInit) .. ' target: ' .. tostring(nInit)); 
+			--Debug.console('greater: ' .. tostring(nGreaterInit) .. ' target: ' .. tostring(nInit));
 			if not nGreaterInit then
-				nNewInit = math.floor(nInit) + 1;	
+				nNewInit = math.floor(nInit) + 1;
 			else
-				nNewInit = nInit + math.min((nGreaterInit-nInit)/2,1); 
+				nNewInit = nInit + math.min((nGreaterInit-nInit)/2,1);
 			end
-			--Debug.console('New Init? ' .. nNewInit .. ' type: ' .. tostring(type(nNewInit))); 
-			DB.setValue(nodeCT,'initresult','number',nNewInit); 
-			windowlist.applySort(true); 
+			--Debug.console('New Init? ' .. nNewInit .. ' type: ' .. tostring(type(nNewInit)));
+			DB.setValue(nodeCT,'initresult','number',nNewInit);
+			windowlist.applySort(true);
 		end
 	end
 
