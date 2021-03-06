@@ -657,11 +657,11 @@ function onDeathRoll(rSource, rTarget, rRoll)
 
 	local rMessage = ActionsManager.createActionMessage(rSource, rRoll);
 
-	if ActorManager5E.getPercentWounded(rSource) >= 1 then
+	if ActorManager5E.getWoundPercent(rSource) >= 1 then
 		local nTotal = ActionsManager.total(rRoll);
 
 		local bStatusCheck = true;
-		local _,sOriginalStatus = ActorManager5E.getPercentWounded(rSource);
+		local _,sOriginalStatus = ActorManager5E.getWoundPercent(rSource);
 
 		local nFirstDie = 0;
 		if #(rRoll.aDice) > 0 then
@@ -733,7 +733,7 @@ function onDeathRoll(rSource, rTarget, rRoll)
 				bShowStatus = not OptionsManager.isOption("SHNPC", "off");
 			end
 			if bShowStatus then
-				local _,sNewStatus = ActorManager5E.getPercentWounded(rSource);
+				local _,sNewStatus = ActorManager5E.getWoundPercent(rSource);
 				if sOriginalStatus ~= sNewStatus then
 					rMessage.text = rMessage.text .. " [" .. Interface.getString("combat_tag_status") .. ": " .. sNewStatus .. "]";
 				end
