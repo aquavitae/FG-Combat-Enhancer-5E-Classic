@@ -901,17 +901,17 @@ function checkConditional(rActor, nodeEffect, aConditions, rTarget, aIgnore)
 	for _,v in ipairs(aConditions) do
 		local sLower = v:lower();
 		if sLower == DataCommon.healthstatusfull then
-			local nPercentWounded = ActorManager5E.getPercentWounded(rActor);
+			local nPercentWounded = ActorManager5E.getWoundPercent(rActor);
 			if nPercentWounded > 0 then
 				bReturn = false;
 			end
 		elseif sLower == DataCommon.healthstatushalf then
-			local nPercentWounded = ActorManager5E.getPercentWounded(rActor);
+			local nPercentWounded = ActorManager5E.getWoundPercent(rActor);
 			if nPercentWounded < .5 then
 				bReturn = false;
 			end
 		elseif sLower == DataCommon.healthstatuswounded then
-			local nPercentWounded = ActorManager5E.getPercentWounded(rActor);
+			local nPercentWounded = ActorManager5E.getWoundPercent(rActor);
 			if nPercentWounded == 0 then
 				bReturn = false;
 			end
